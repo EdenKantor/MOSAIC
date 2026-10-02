@@ -1,0 +1,40 @@
+# Review the pilot and select viable families before using this template.
+# Execution requires --confirm-pilot-reviewed. Do not treat this as an automatic next stage.
+calibration_id: alem-capability-expanded
+stage: expanded
+environment:
+  name: alem
+  revision: 14d412e5ee961f9c43d6ce92ee05fee9cd1efc5e
+agent:
+  agent_id: agent_0
+prompt_protocol: alem_official_v1
+history_limit: 8
+seeds: [42, 19, 20, 7, 11, 0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 13, 14, 15, 16]
+weak:
+  provider: ollama
+  model: qwen3:4b
+  temperature: 0
+  max_output_tokens: 2048
+  thinking: true
+  context_window: 32768
+  timeout_seconds: 120
+teacher:
+  provider: groq
+  model: openai/gpt-oss-120b
+  temperature: 0
+  max_output_tokens: 2048
+  reasoning_effort: medium
+  timeout_seconds: 120
+families:
+  - name: resource-acquisition
+    task: collect_wood
+    max_steps: 200
+  - name: navigation-and-acquisition
+    task: collect_stone
+    max_steps: 200
+  - name: simple-crafting
+    task: make_wood_pickaxe
+    max_steps: 200
+  - name: multi-step-crafting
+    task: make_stone_pickaxe
+    max_steps: 200
