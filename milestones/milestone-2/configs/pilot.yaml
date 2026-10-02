@@ -1,0 +1,15 @@
+experiment_id: fake-pilot
+seed: 42
+environment:
+  name: fake
+  revision: "1"
+task: repair_pump
+agent:
+  agent_id: agent_0
+model:
+  provider: fake
+  model: deterministic-policy-v1
+  policy: repair_pump
+  temperature: 0.0
+  max_output_tokens: 64
+max_steps: 20

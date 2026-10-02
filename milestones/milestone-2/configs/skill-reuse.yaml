@@ -1,0 +1,16 @@
+experiment_id: shared-skill-reuse
+seed: 42
+environment:
+  name: fake
+  revision: "1"
+task: repair_pump
+agent:
+  agent_id: agent_2
+model:
+  provider: fake
+  model: fake-weak-v1
+  policy: follow_skill
+max_steps: 32
+skills:
+  mode: reuse
+  playbook_path: runs/skill-pilot/playbook.json

@@ -1,0 +1,23 @@
+experiment_id: weak-success-b3
+seed: 42
+environment:
+  name: fake
+  revision: "1"
+task: repair_pump
+agent:
+  agent_id: agent_0
+model:
+  provider: fake
+  model: fake-weak-v1
+  policy: repair_pump
+teacher:
+  access: available
+  model:
+    provider: fake
+    model: fake-teacher-v1
+    policy: repair_pump
+routing:
+  attempt_steps: 20
+  recovery_attempts: 1
+  recovery_steps: 20
+max_steps: 32

@@ -1,0 +1,26 @@
+experiment_id: routing-only-b3
+seed: 42
+environment:
+  name: fake
+  revision: "1"
+task: repair_pump
+agent:
+  agent_id: agent_0
+model:
+  provider: fake
+  model: fake-weak-v1
+  policy: first_available
+teacher:
+  access: available
+  model:
+    provider: fake
+    model: fake-teacher-v1
+    policy: repair_pump
+routing:
+  strategy: bounded_failure
+  attempt_steps: 1
+  recovery_attempts: 1
+  recovery_steps: 1
+  consecutive_failure_limit: 2
+  history_limit: 8
+max_steps: 32
