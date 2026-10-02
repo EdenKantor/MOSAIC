@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mosaic-research"
+version = "0.2.25"
+description = "Reproducible experiments on durable agent capability"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["pydantic>=2.11,<3", "PyYAML>=6.0.2,<7"]
+
+[project.optional-dependencies]
+alem = ["alem-env @ git+https://github.com/alem-world/alem-env.git@14d412e5ee961f9c43d6ce92ee05fee9cd1efc5e ; python_version < '3.13'"]
+
+[dependency-groups]
+dev = ["pytest>=8.3,<10", "ruff>=0.11,<1", "mypy>=1.15,<2", "types-PyYAML>=6.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["mosaic"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["mosaic", "tests"]
+
+[[tool.mypy.overrides]]
+module = ["alem.*", "jax.*", "numpy.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["alem: optional real Alem smoke test (requires MOSAIC_TEST_ALEM=1)"]
