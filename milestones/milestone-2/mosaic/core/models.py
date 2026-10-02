@@ -54,15 +54,41 @@ class EnvironmentSnapshot(FrozenModel):
 class TokenUsage(FrozenModel):
     input_tokens: int | None = Field(default=None, ge=0)
     output_tokens: int | None = Field(default=None, ge=0)
+    reasoning_tokens: int | None = Field(default=None, ge=0)
+    cached_input_tokens: int | None = Field(default=None, ge=0)
+    provider_total_tokens: int | None = Field(default=None, ge=0)
+    provider_request_id: str | None = Field(default=None, min_length=1)
     measurement: Literal["provider", "synthetic", "unavailable"] = "unavailable"
+    measurement_source: str | None = Field(default=None, min_length=1)
+
+    @field_validator("provider_request_id", "measurement_source")
+    @classmethod
+    def nonempty_metadata(cls, value: str | None) -> str | None:
+        if value is not None and not value.strip():
+            raise ValueError("Usage metadata must not be blank")
+        return value
 
     @model_validator(mode="after")
     def consistent_measurement(self) -> Self:
-        counts = (self.input_tokens, self.output_tokens)
+        counts = (
+            self.input_tokens,
+            self.output_tokens,
+            self.reasoning_tokens,
+            self.cached_input_tokens,
+            self.provider_total_tokens,
+        )
         if self.measurement == "unavailable" and any(value is not None for value in counts):
             raise ValueError("Known usage must identify its measurement source")
-        if self.measurement == "synthetic" and any(value is None for value in counts):
+        if self.measurement == "synthetic" and (
+            self.input_tokens is None or self.output_tokens is None
+        ):
             raise ValueError("Synthetic fixture usage must include both counts")
+        if (
+            self.input_tokens is not None
+            and self.cached_input_tokens is not None
+            and self.cached_input_tokens > self.input_tokens
+        ):
+            raise ValueError("Cached input usage cannot exceed reported input usage")
         return self
 
 

@@ -29,9 +29,9 @@ compilation:
   observation_fields: [position, part_position, has_part, pump_repaired]
   max_actions: 32
 validation:
-  seeds: [42]
+  seeds: [19]
   max_steps: 32
 reuse:
-  seeds: [42]
+  seeds: [20]
   max_steps: 32
   agent_id: agent_1

@@ -161,6 +161,15 @@ class ValidationTrial(FrozenModel):
             or teacher.unknown_output_calls
             or teacher.synthetic_usage_calls
             or teacher.wall_clock_ms
+            or teacher.reasoning_tokens not in (None, 0)
+            or teacher.cached_input_tokens not in (None, 0)
+            or teacher.provider_total_tokens not in (None, 0)
+            or teacher.known_reasoning_tokens
+            or teacher.known_cached_input_tokens
+            or teacher.known_provider_total_tokens
+            or teacher.unknown_reasoning_calls
+            or teacher.unknown_cached_input_calls
+            or teacher.unknown_provider_total_calls
         ):
             raise ValueError("Skill validation must not use the teacher")
         return self

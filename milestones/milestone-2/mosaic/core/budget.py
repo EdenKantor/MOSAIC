@@ -1,6 +1,7 @@
 from dataclasses import dataclass
+from typing import Any
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from mosaic.core.models import FrozenModel, ModelRole, TokenUsage
 
@@ -15,6 +16,35 @@ class RoleBudgetTotals(FrozenModel):
     unknown_output_calls: int = Field(ge=0)
     synthetic_usage_calls: int = Field(ge=0)
     wall_clock_ms: float = Field(ge=0)
+    reasoning_tokens: int | None = Field(default=None, ge=0)
+    cached_input_tokens: int | None = Field(default=None, ge=0)
+    provider_total_tokens: int | None = Field(default=None, ge=0)
+    known_reasoning_tokens: int = Field(default=0, ge=0)
+    known_cached_input_tokens: int = Field(default=0, ge=0)
+    known_provider_total_tokens: int = Field(default=0, ge=0)
+    unknown_reasoning_calls: int = Field(default=0, ge=0)
+    unknown_cached_input_calls: int = Field(default=0, ge=0)
+    unknown_provider_total_calls: int = Field(default=0, ge=0)
+
+    @model_validator(mode="before")
+    @classmethod
+    def preserve_legacy_unknown_usage(cls, value: Any) -> Any:
+        """A legacy summary omitting a dimension supplies no evidence of zero usage."""
+        if not isinstance(value, dict):
+            return value
+        result = dict(value)
+        for dimension, unknown_field in (
+            ("reasoning_tokens", "unknown_reasoning_calls"),
+            ("cached_input_tokens", "unknown_cached_input_calls"),
+            ("provider_total_tokens", "unknown_provider_total_calls"),
+        ):
+            reported = result.get(dimension)
+            if unknown_field not in result:
+                result[unknown_field] = result.get("model_calls", 0) if reported is None else 0
+            known_field = f"known_{dimension}"
+            if known_field not in result and reported is not None:
+                result[known_field] = reported
+        return result
 
 
 class BudgetTotals(RoleBudgetTotals):
@@ -35,21 +65,38 @@ class _CallUsage:
     responded: bool = False
 
 
+def _dimension_totals(calls: list[_CallUsage], dimension: str) -> tuple[int | None, int, int]:
+    values: list[int | None] = [getattr(call.usage, dimension) for call in calls]
+    unknown = sum(value is None for value in values)
+    known = sum(value for value in values if value is not None)
+    return None if unknown else known, known, unknown
+
+
 def _totals(calls: list[_CallUsage], wall_clock_ms: float) -> RoleBudgetTotals:
-    unknown_in = sum(c.usage.input_tokens is None for c in calls)
-    unknown_out = sum(c.usage.output_tokens is None for c in calls)
-    known_in = sum(c.usage.input_tokens or 0 for c in calls)
-    known_out = sum(c.usage.output_tokens or 0 for c in calls)
+    input_tokens, known_in, unknown_in = _dimension_totals(calls, "input_tokens")
+    output_tokens, known_out, unknown_out = _dimension_totals(calls, "output_tokens")
+    reasoning, known_reasoning, unknown_reasoning = _dimension_totals(calls, "reasoning_tokens")
+    cached, known_cached, unknown_cached = _dimension_totals(calls, "cached_input_tokens")
+    provider_total, known_total, unknown_total = _dimension_totals(calls, "provider_total_tokens")
     return RoleBudgetTotals(
         model_calls=len(calls),
-        input_tokens=None if unknown_in else known_in,
-        output_tokens=None if unknown_out else known_out,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
         known_input_tokens=known_in,
         known_output_tokens=known_out,
         unknown_input_calls=unknown_in,
         unknown_output_calls=unknown_out,
         synthetic_usage_calls=sum(c.usage.measurement == "synthetic" for c in calls),
         wall_clock_ms=wall_clock_ms,
+        reasoning_tokens=reasoning,
+        cached_input_tokens=cached,
+        provider_total_tokens=provider_total,
+        known_reasoning_tokens=known_reasoning,
+        known_cached_input_tokens=known_cached,
+        known_provider_total_tokens=known_total,
+        unknown_reasoning_calls=unknown_reasoning,
+        unknown_cached_input_calls=unknown_cached,
+        unknown_provider_total_calls=unknown_total,
     )
 
 

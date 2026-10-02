@@ -1,5 +1,5 @@
 experiment_id: shared-skill-reuse
-seed: 42
+seed: 20
 environment:
   name: fake
   revision: "1"

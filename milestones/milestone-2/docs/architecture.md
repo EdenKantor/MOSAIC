@@ -1,6 +1,8 @@
 # Current architecture
 
-Milestone 2 composes persistent procedures with the existing environment-independent runner:
+Milestone 2 composes persistent procedures with the existing environment-independent runner.
+This is a completed engineering scaffold for plumbing, validation gates, persistence and
+accounting, using deterministic fixtures. Scientific usefulness and transfer are unvalidated.
 
 ```text
 frozen configuration
@@ -34,6 +36,11 @@ Weak and teacher providers are distinct instances. The teacher remains behind
 before dispatch. History, routing counters, skill cursor and ledger are local to an episode.
 No previous history is silently carried into a new agent run.
 
+`TeacherCapability.withdraw()` is a tested primitive that prevents new invocations through
+that capability. It is not a scheduled hard-withdrawal experiment, a sandbox against arbitrary
+Python, or cancellation of an already dispatched request. M3 is deferred until measurement,
+real-model calibration, protocol freeze and real-trajectory semantics are complete.
+
 Models receive task, visible observation, advertised actions and bounded visible feedback.
 Weak reuse additionally receives the selected procedure and cursor, without validation verdicts
 or source provenance. Snapshots and private verifier evidence remain audit data. The compiler
@@ -49,6 +56,18 @@ Candidate compilation extracts accepted teacher actions into a bounded declarati
 Scope and exact visible initiation conditions constrain use. Validation records whether the
 weak agent followed the complete sequence and achieved verified success. Promotion requires
 every configured validation seed to pass.
+
+The current sequence is a teacher suffix whose initiation conditions describe takeover.
+Retrieval happens only during episode initialization, while validation also starts at reset.
+The fake weak prefix waits, so selected state fields still match despite changed excluded step
+metadata. Real weak progress can break this equivalence. The engine does not retrieve mid-episode
+or reconstruct takeover states for validation. This is a blocker for real-trajectory skill
+semantics, not a demonstrated transfer mechanism.
+
+Two later options are documented in [skill semantics](skills.md): a complete accepted
+reset-to-goal workflow under initial conditions (preferred for Experiment 1), or dynamically
+retrieved subgoal suffixes validated from defensible starting states. Neither redesign is
+implemented here; real-model calibration comes first.
 
 The JSON PlayBook stores only verified entries with reports and integrity metadata. Atomic
 replacement prevents a partial file from becoming valid. This is a single-writer prototype,
@@ -80,3 +99,8 @@ reuse rather than omitting acquisition cost from reuse comparisons.
 There is no population scheduler, communication layer, learned routing, vector store, repair
 service, cost-aware investment gate, global withdrawal phase or renderer. Milestones 0 and 1
 retain independent source, event schemas and lockfiles.
+
+The revised roadmap is M0 complete → M1 complete → M2 engineering scaffold complete → M1.25
+measurement/provider hardening → M1.5 real-model calibration → M1.75 protocol freeze → M2-R
+real-trajectory skill semantics → M3 hard withdrawal → M4 economics. The next recommended step
+is to run real-model calibration after provider and measurement hardening.

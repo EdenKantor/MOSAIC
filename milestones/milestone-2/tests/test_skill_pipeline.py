@@ -116,8 +116,8 @@ def test_full_lifecycle_reconciles_costs_and_injected_context(
 
     phase_paths = (
         output / "acquisition" / "events.jsonl",
-        output / "validation" / "42" / "events.jsonl",
-        output / "reuse" / "42" / "events.jsonl",
+        output / "validation" / "19" / "events.jsonl",
+        output / "reuse" / "20" / "events.jsonl",
     )
     phase_events = tuple(event for path in phase_paths for event in read_events(path))
     calls = [event.payload for event in phase_events if isinstance(event.payload, ModelCalled)]
@@ -286,7 +286,7 @@ def test_ignored_candidate_fails_validation_after_one_divergent_action(
     assert not result.playbook_path.exists()
     failures = [
         event.payload
-        for event in read_events(tmp_path / "learn" / "validation" / "42" / "events.jsonl")
+        for event in read_events(tmp_path / "learn" / "validation" / "19" / "events.jsonl")
         if isinstance(event.payload, SkillExecutionFailed)
     ]
     assert len(failures) == 1 and failures[0].completed_actions == 0

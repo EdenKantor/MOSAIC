@@ -2,9 +2,11 @@
 
 **Teacher → Candidate Skill → Weak-Agent Validation → Shared PlayBook.**
 
-This folder adds persistent, validated procedures to the Milestone 1 runner. Milestones 0
-and 1 remain independently runnable in their own folders. The providers in these examples
-are deterministic fixtures; they do not establish language-model learning or transfer.
+This folder adds procedure validation gates and persistent shared memory to the Milestone 1
+runner. Its **engineering scaffold is complete; it is not scientifically validated**.
+The deterministic fixtures demonstrate plumbing, validation gates, persistence and accounting.
+They do not demonstrate useful transfer, real-model learning or economic savings. Milestones
+0 and 1 remain independently runnable in their own folders.
 
 ## Run acquisition and reuse
 
@@ -22,10 +24,10 @@ Fresh weak-only episodes validate it on the configured seeds. Promotion requires
 validation episode to follow the complete procedure and achieve environment-verified success.
 A JSON PlayBook persists only promoted procedures and their validation reports.
 
-The default demonstration acquires, validates and reuses the seed-42 pump procedure. Reuse
-uses another agent ID and a newly opened PlayBook. Its visible starting conditions match
-acquisition. This is **seen-condition reuse**, not evidence of near transfer, composition
-or generalization.
+The default demonstration acquires on seed 42, validates on seed 19 and reuses on seed 20.
+All three have initial part location 7 and matching selected visible starting conditions.
+Reuse uses another agent ID and a newly opened PlayBook. Independent seeds here demonstrate
+**seen-condition reuse**, not held-out generalization, useful near transfer or composition.
 
 After that command creates the PlayBook, run an independent reuse episode:
 
@@ -38,6 +40,14 @@ and its cursor; the runner checks the action through its usual parser and enviro
 interface. The fake `follow_skill` policy follows the supplied hint and otherwise waits.
 A retrieval miss continues ordinary weak execution. Procedure divergence or rejection records
 a skill failure; ordinary execution may continue on the next turn.
+
+The compiler currently stores only the teacher suffix and activates it under the teacher's
+takeover conditions. Retrieval happens only at episode initialization, and validation also
+starts from reset. The fixture's weak prefix waits and changes only excluded step metadata,
+so those conditions happen to match. If a real weak agent makes progress before takeover,
+the suffix may not apply at reset. This unresolved semantic mismatch blocks real-trajectory
+skill claims. Calibration comes first; [skill semantics](docs/skills.md) records two redesign
+options without implementing either.
 
 ## Traces and persistence
 
@@ -78,7 +88,9 @@ uv run --locked python -m mypy mosaic tests
 uv run --locked python -m pytest -q
 ```
 
-The core suite needs no Alem installation, credentials or real-model service. On Windows
+Core CI covers the independently runnable M0/M1/M2 folders on Python 3.12 without Alem or
+ordinary real-provider calls. The core suite needs no Alem installation, credentials or
+real-model service. On Windows
 systems blocking the compiled mypy extension, use its source build:
 
 ```sh
@@ -101,4 +113,10 @@ than Alem capability. This milestone does not claim meaningful skill acquisition
 Alem's text observations; see [Alem notes](docs/alem.md). No real-model provider or large
 weights are added.
 
-The next recommended milestone, after review, is **Milestone 3 — Hard Teacher Withdrawal**.
+The tested `TeacherCapability.withdraw()` remains a runtime primitive; no scheduled M3 study
+is implemented. The revised sequence is measurement/provider hardening (M1.25), real-model
+calibration (M1.5), protocol freeze (M1.75), real-trajectory skill semantics (M2-R), hard teacher
+withdrawal (M3), then economics (M4).
+
+The next recommended step is to **run real-model calibration** after provider and measurement
+hardening.

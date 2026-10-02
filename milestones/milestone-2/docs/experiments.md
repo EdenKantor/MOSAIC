@@ -1,5 +1,9 @@
 # Experiment semantics
 
+Milestone 2 is a completed engineering scaffold, not a scientifically validated skill study.
+Deterministic fixtures exercise plumbing, validation gates, persistence and accounting;
+successful runs do not establish useful transfer or real-model learning.
+
 ## Inputs and episode outputs
 
 YAML is validated once into frozen configuration. Unknown fields, invalid seeds, unsupported
@@ -33,7 +37,8 @@ action feedback; private snapshots and verifier evidence are excluded.
 
 The candidate extracts the bounded teacher sequence and exact conditions for configured visible
 JSON fields. The pilot uses `position`, `part_position`, `has_part` and `pump_repaired`,
-a 32-action cap, validation seed `42` and reuse seed `42`. Validation seeds are nonempty
+a 32-action cap, acquisition seed `42`, validation seed `19` and reuse seed `20`. All three
+select initial part location 7 and matching selected starting conditions. Validation seeds are nonempty
 and unique. Weak-only validation and reuse each allow up to 32 decisions; reuse uses
 `agent_1`.
 
@@ -61,7 +66,16 @@ all inference and action attempts.
 
 A retrieved entry must be verified, intact and match environment identity, pinned revision,
 task and exact configured visible starting conditions. No embeddings or teacher inference
-participate. Default reuse repeats seen conditions; different part locations do not match.
+participate. Default reuse repeats seen conditions under an independent seed; different part
+locations do not match. The seed split is not held-out generalization.
+
+The candidate is a teacher suffix with initiation measured at takeover. The runner attempts
+retrieval only at reset, and validation starts at reset too. In this fixture, the weak prefix
+waits and changes only excluded step metadata, so projected takeover and reset conditions
+coincide. A real weak prefix can move or manipulate the task before escalation, making a valid
+teacher suffix inapplicable or unsuccessful from reset. Current experiments do not solve this
+semantic blocker. [Skill semantics](skills.md) records the preferred complete-workflow option
+for Experiment 1 and the dynamic-subgoal alternative; neither is implemented.
 
 A miss continues ordinary weak/routing behavior. Once retrieved, proposal divergence, parsing
 rejection or environment rejection records a skill failure and removes the hint. Ordinary
@@ -114,3 +128,17 @@ attempt overhead. They do not silently become retrieval misses.
 Existing output directories are never overwritten.
 
 CLI exit codes remain 0 success, 1 completed unsuccessful experiment and 2 setup/runtime error.
+
+## Calibration before later milestones
+
+Core CI covers M0, M1 and M2 on Python 3.12 without Alem or ordinary real-provider calls.
+These checks validate engineering behavior, not the research hypothesis. Optional integration
+and real-model calibration evidence must be reported separately without fabricated results.
+
+The revised order is M0 complete → M1 complete → M2 engineering scaffold complete → M1.25
+measurement/provider hardening → M1.5 real-model calibration → M1.75 protocol freeze → M2-R
+real-trajectory skill semantics → M3 hard withdrawal → M4 economics. The tested capability
+withdrawal primitive is preserved; no M3 experiment is implemented in this folder.
+
+The next recommended step is to run real-model calibration after provider and measurement
+hardening.

@@ -35,11 +35,28 @@ from mosaic.skills.playbook import PlayBook
 from mosaic.skills.validation import SkillValidator
 
 
+def _merge_dimension(
+    values: tuple[RoleBudgetTotals, ...], dimension: str, unknown_field: str
+) -> tuple[int | None, int, int]:
+    known = sum(getattr(value, f"known_{dimension}") for value in values)
+    unknown = sum(getattr(value, unknown_field) for value in values)
+    return None if unknown else known, known, unknown
+
+
 def _merge_role(values: tuple[RoleBudgetTotals, ...]) -> RoleBudgetTotals:
     known_in = sum(value.known_input_tokens for value in values)
     known_out = sum(value.known_output_tokens for value in values)
     unknown_in = sum(value.unknown_input_calls for value in values)
     unknown_out = sum(value.unknown_output_calls for value in values)
+    reasoning, known_reasoning, unknown_reasoning = _merge_dimension(
+        values, "reasoning_tokens", "unknown_reasoning_calls"
+    )
+    cached, known_cached, unknown_cached = _merge_dimension(
+        values, "cached_input_tokens", "unknown_cached_input_calls"
+    )
+    provider_total, known_total, unknown_total = _merge_dimension(
+        values, "provider_total_tokens", "unknown_provider_total_calls"
+    )
     return RoleBudgetTotals(
         model_calls=sum(value.model_calls for value in values),
         input_tokens=None if unknown_in else known_in,
@@ -50,6 +67,15 @@ def _merge_role(values: tuple[RoleBudgetTotals, ...]) -> RoleBudgetTotals:
         unknown_output_calls=unknown_out,
         synthetic_usage_calls=sum(value.synthetic_usage_calls for value in values),
         wall_clock_ms=sum(value.wall_clock_ms for value in values),
+        reasoning_tokens=reasoning,
+        cached_input_tokens=cached,
+        provider_total_tokens=provider_total,
+        known_reasoning_tokens=known_reasoning,
+        known_cached_input_tokens=known_cached,
+        known_provider_total_tokens=known_total,
+        unknown_reasoning_calls=unknown_reasoning,
+        unknown_cached_input_calls=unknown_cached,
+        unknown_provider_total_calls=unknown_total,
     )
 
 
