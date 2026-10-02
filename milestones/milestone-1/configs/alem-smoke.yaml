@@ -1,0 +1,16 @@
+# A wiring smoke test, not a capability evaluation or Alem leaderboard run.
+experiment_id: alem-smoke
+seed: 42
+environment:
+  name: alem
+  revision: 14d412e5ee961f9c43d6ce92ee05fee9cd1efc5e
+task: collect_wood
+agent:
+  agent_id: agent_0
+model:
+  provider: fake
+  model: deterministic-policy-v1
+  policy: first_available
+  temperature: 0.0
+  max_output_tokens: 64
+max_steps: 1

@@ -1,0 +1,24 @@
+# Wiring smoke, not an Alem capability evaluation. Both fixtures choose Noop.
+experiment_id: alem-routing-smoke-b3
+seed: 42
+environment:
+  name: alem
+  revision: 14d412e5ee961f9c43d6ce92ee05fee9cd1efc5e
+task: collect_wood
+agent:
+  agent_id: agent_0
+model:
+  provider: fake
+  model: fake-weak-v1
+  policy: first_available
+teacher:
+  access: available
+  model:
+    provider: fake
+    model: fake-teacher-v1
+    policy: first_available
+routing:
+  attempt_steps: 1
+  recovery_attempts: 1
+  recovery_steps: 1
+max_steps: 3

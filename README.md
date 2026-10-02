@@ -8,14 +8,14 @@ commit. Earlier milestone folders are preserved when later milestones are implem
 | Folder | Scope | Status |
 | --- | --- | --- |
 | [milestones/milestone-0](milestones/milestone-0/README.md) | Deterministic single-agent vertical slice | Implemented and tested |
-| `milestones/milestone-1` | Bounded teacher escalation, routing-only baseline B3 | Next milestone |
+| [milestones/milestone-1](milestones/milestone-1/README.md) | Bounded teacher escalation, routing-only baseline B3 | Implemented and tested |
 
-Run Milestone 0 from its directory:
+Run the routing-only baseline from its directory:
 
 ```sh
-cd milestones/milestone-0
+cd milestones/milestone-1
 uv sync --locked
-uv run --locked python -m mosaic.experiments.run --config configs/pilot.yaml
+uv run --locked python -m mosaic.experiments.run --config configs/routing.yaml
 ```
 
 Each folder has its own package, lockfile, configurations, tests, documentation and run outputs.
