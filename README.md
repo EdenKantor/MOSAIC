@@ -12,8 +12,9 @@ commit. Earlier milestone folders are preserved when later milestones are implem
 | [milestones/milestone-0](milestones/milestone-0/README.md) | Deterministic single-agent vertical slice | Implemented and tested |
 | [milestones/milestone-1](milestones/milestone-1/README.md) | Bounded teacher escalation, routing-only baseline B3 | Implemented and tested |
 | [milestones/milestone-2](milestones/milestone-2/README.md) | Candidate procedures, weak validation and shared PlayBook | Engineering scaffold complete; scientifically unvalidated |
-| [milestones/milestone-1.25](milestones/milestone-1.25/README.md) | Usage accounting, real-provider adapters and independent calibration runner | Implemented; real-provider executions pending |
-| [milestones/milestone-1.5](milestones/milestone-1.5/README.md) | Paired real-model capability protocol and configurations | Prepared; calibration results pending |
+| [milestones/milestone-1.25](milestones/milestone-1.25/README.md) | Usage accounting, real-provider adapters and independent calibration runner | Tested; Gemini/Groq execution evidence recorded |
+| [milestones/milestone-1.5](milestones/milestone-1.5/README.md) | Independent real-model candidate calibration | Partial real results; provider failures stopped the batch; no pair selected |
+| [milestones/laboratory](milestones/laboratory/README.md) | Local read-only evidence replay and paired comparison | Implemented; no runtime control |
 
 Milestone 2 demonstrates plumbing, validation gates, persistence and accounting with
 deterministic fixtures. It does not demonstrate useful procedural transfer between real models. Its
@@ -54,7 +55,15 @@ real-trajectory skill claims; see [the semantics and redesign options](milestone
 The existing `TeacherCapability.withdraw()` is a tested runtime primitive, not a completed M3
 experiment.
 
-Core CI covers M0, M1, M1.25 and M2 on Python 3.12 without Alem or real-provider calls.
+Core CI covers M0, M1, M1.25, M2 and the Laboratory on Python 3.12 without Alem or real-provider calls.
 Optional Alem integration and real-model calibration remain separate from deterministic core
-checks. The next recommended step is to **run real-model calibration** after provider and
-measurement hardening, before freezing the protocol or implementing M2-R/M3.
+checks. The [current API-only candidate calibration](milestones/milestone-1.5/README.md)
+requires free-only account verification, access metadata, smoke, empirical candidate
+selection and a registered paired pilot. The historical configs do not establish model roles.
+Real calibration must precede protocol freeze and M2-R. M3 remains stopped.
+
+The [2026-10-03 calibration report](milestones/milestone-1.5/reports/2026-10-03/calibration-report.md)
+records 16 inference attempts, seven usable model smokes and two completed seed-42
+resource tasks. GPT-OSS 20B and 120B both succeeded on that seed; this demonstrates
+no useful capability gap. Gemini HTTP 503 and Groq HTTP 429 stopped further dispatch.
+Incomplete runs remain unknown capability outcomes. No five-seed pilot or skill work followed.

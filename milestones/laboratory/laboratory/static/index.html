@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MOSAIC Laboratory</title><link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand"><span class="mark" aria-hidden="true">▦</span><div><h1>MOSAIC <span>Laboratory</span></h1><p>Observe the trajectory. Inspect the evidence.</p></div></div>
+    <span class="pill"><span class="dot"></span> Saved artifact replay</span>
+  </header>
+  <main>
+    <section class="intro"><div><p class="eyebrow">RESEARCH WORKBENCH</p><h2>From decisions to outcomes.</h2><p>Replay recorded agent behavior, one event at a time. Compare the same task and seed across independent runs.</p></div><div class="protocol"><strong>Read-only · Local</strong><span>No inference or runtime controls</span></div></section>
+    <div id="notice" class="notice" role="status">Loading saved artifacts…</div>
+    <section class="selectors" aria-label="Choose replay runs">
+      <label>Primary run<select id="primary"><option value="">Choose a saved run</option></select></label>
+      <label>Matched comparison<select id="comparison"><option value="">Single-run replay</option></select></label>
+      <button id="reload" class="secondary">Reload artifacts</button>
+    </section>
+    <section class="transport" aria-label="Replay controls">
+      <button id="previous" title="Previous event" aria-label="Previous event">←</button><button id="play">Play</button><button id="next" title="Next event" aria-label="Next event">→</button>
+      <label class="speed">Speed<select id="speed"><option value="1200">0.5×</option><option value="600" selected>1×</option><option value="300">2×</option><option value="150">4×</option></select></label>
+      <label class="sync"><input id="sync" type="checkbox" checked> Synchronize by step</label>
+      <span id="position">No run selected</span>
+      <input id="scrubber" type="range" min="0" max="0" value="0" aria-label="Timeline position">
+    </section>
+    <div id="pair-note" class="pair-note">Comparisons require a recorded task and seed match. Matching labels alone do not establish scientific comparability.</div>
+    <section id="panels" class="panels" aria-label="Agent replay panels"></section>
+    <section class="timeline-section"><div class="section-title"><h3>Event timeline</h3><span>Primary run · select an event to inspect</span></div><div id="timeline" class="timeline"><p class="empty">Select a saved run to begin.</p></div></section>
+    <section class="audit-section"><div><h3>AUDIT VIEW</h3><p>Privileged simulator snapshots and verifier evidence. Replay research evidence only; never actor input.</p></div><label><input id="audit" type="checkbox" disabled> I explicitly opt in to privileged evidence</label><p id="audit-status">Audit access is disabled unless the server was launched with --allow-audit.</p><div id="audit-content" hidden></div></section>
+    <footer>ENGINEERING VIEWER · Saved artifacts are evidence of recorded behavior, not a claim of learning, transfer, or model superiority.</footer>
+  </main>
+</body>
+</html>

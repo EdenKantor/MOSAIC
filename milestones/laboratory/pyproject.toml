@@ -1,0 +1,21 @@
+[project]
+name = "mosaic-laboratory"
+version = "0.1.0"
+description = "Read-only local replay of MOSAIC research artifacts"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = ["ruff>=0.11,<1", "mypy>=1.15,<2"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["laboratory", "tests"]
