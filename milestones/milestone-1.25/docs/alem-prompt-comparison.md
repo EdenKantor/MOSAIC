@@ -35,6 +35,14 @@ is retroactively claimed or corrected by this observation.
 the declared public focused task. The parent agent adds the same one-action JSON output
 contract for both model roles. Rules come from upstream rather than a fabricated task solver.
 
+The API-only candidate protocol added on 2026-10-03 serializes identical system/user
+content for Gemini and Groq. Gemini maps it into `systemInstruction`/`contents`; Groq uses
+chat messages. Both request native JSON object mode without an action enum or schema
+constraint, leaving malformed shape and action legality to the same local validator.
+Framework role labels and agent IDs remain absent from current and history input.
+Gemini's `includeThoughts=false` omits returned thought text; it does not establish that
+internal reasoning is disabled. Provider-reported thought usage remains a separate dimension.
+
 ## Rules, observations and action access
 
 The calibration uses `AlemLanguageWrapperSingle`, as the official `CraftaxEnv` does when its

@@ -2,7 +2,7 @@
 
 ## Implemented
 
-This folder adds Ollama/Groq provider adapters, five raw usage dimensions with request/source
+This folder adds Ollama/Groq/Gemini provider adapters, five raw usage dimensions with request/source
 metadata, and an official solo Alem calibration prompt. The adapters are **implemented but
 uncalibrated**. Mocked tests and scripted fixtures do not establish useful model performance,
 useful transfer or savings. No M3 experiment or skill redesign is included.
@@ -25,7 +25,37 @@ role efficiencies 1.0 makes the registered resource/tool tasks reachable for the
 These are explicit conditions for both model roles, not the official cooperative benchmark.
 See [the source comparison](alem-prompt-comparison.md).
 
-## Tests run
+## Current verification — 2026-10-03
+
+Locked dependency synchronization and Python 3.12 formatting, lint, strict typing and offline
+tests passed before live smoke. Ordinary CI excludes the optional Alem marker and installs no
+Alem/JAX or provider SDK. The final M1.25 rerun followed the model-specific 404 correction
+and the fix for generic billing links in HTTP 429 error bodies.
+
+| Folder | Current result | Test time | Type-checked files |
+| --- | --- | --- | --- |
+| M0 | 26 passed; 1 Alem test deselected | 5.43 s | 23 |
+| M1 | 41 passed; 2 Alem tests deselected | 8.54 s | 26 |
+| M2 | 195 passed; 2 Alem tests deselected | 27.27 s | 41 |
+| M1.25 | 265 passed; 3 Alem tests deselected | 28.70 s | 39 |
+| Laboratory | 16 stdlib tests passed | 1.122 s | 6 |
+
+The optional pinned-Alem crafting/rule protocol check also passed: 1 test, 10 deselected,
+27.97 seconds, with zero model calls. Laboratory JavaScript syntax and replay logic passed;
+browser visual inspection was unavailable. The source-build mypy workaround remains local
+to this Windows host; ordinary Linux CI uses its locked dependency installation.
+
+New mocked coverage includes Gemini normalization/usage, captured/current secret redaction,
+quota headers, single physical attempts, 13+ registered candidates, prior-batch hydration,
+model-specific 404 exclusion, request/token guards before call reservation, provider-fatal
+stops, incomplete-ledger stops and infrastructure exclusions from capability denominators.
+The existing withdrawn-teacher boundary remains checked before a provider adapter dispatch.
+
+Real free-only access/smoke/diagnostic evidence is separate from these tests. Its current
+status is recorded under [M1.5 reports](../../milestone-1.5/reports/2026-10-03/).
+No useful capability gap, transfer or withdrawal claim follows from an infrastructure smoke.
+
+## Historical tests — 2026-10-02
 
 Local verification completed on Python 3.12. These portable locked commands express the checks
 run from each independently runnable package:
@@ -68,9 +98,11 @@ registered achievement goals and crafting reachability under controlled test sta
 This is simulator/protocol evidence, not a successful real-model trajectory or benchmark score.
 These are local verification results; hosted CI/publication status is reported separately.
 
-## Example run
+## Historical preparation example — 2026-10-02
 
-The calibration procedure is configured, not a completed real-model result:
+The earlier calibration procedure was configured, not an empirically selected pair.
+The following records its original non-inference check; current real runs must use the
+candidate-selection gates and free-only registrations described in M1.5.
 
 ```sh
 uv sync --locked --extra alem --python 3.12
@@ -86,9 +118,9 @@ The actual non-inference preflight reported:
 | Local Ollama service / configured model | Unavailable |
 | `GROQ_API_KEY` in the environment | Missing |
 
-Preflight is not ready. It made zero inference calls and zero Groq network requests; no real
-pilot was run. The local service/model and environment credential must be available before
-real calibration can begin. Credential presence alone would not validate remote access.
+That historical preflight was not ready. It made zero inference calls and zero Groq network
+requests; no real pilot was run then. Current API-only prerequisites passed on 2026-10-03
+after credentials became available. Credential presence alone never establishes remote access.
 
 The pilot independently evaluates weak-only and teacher-only
 arms for four task families across seeds 42, 19, 20, 7 and 11. Both have the same rules, visible
@@ -142,5 +174,5 @@ withdrawal and M4 economics. The tested legacy withdrawal capability remains a p
 
 ## Next recommended step
 
-Run real-model calibration and review the five-seed pilot before expanding or making skill /
-withdrawal claims.
+Resume real-model candidate calibration within verified available free quota, select a pair
+from empirical evidence, and register its five-seed pilot before skill/withdrawal claims.

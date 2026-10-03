@@ -10,6 +10,7 @@ from mosaic.providers.http import (
     HttpTransport,
     ProviderError,
     StdlibHttpTransport,
+    environment_secrets,
     optional_count,
     optional_identifier,
     redact,
@@ -55,7 +56,7 @@ class OllamaModelProvider:
         self.__endpoint = _local_endpoint()
         self.__transport = transport or StdlibHttpTransport()
         self.__timeout_seconds = timeout_seconds
-        self.__captured_secret = os.environ.get("GROQ_API_KEY", "")
+        self.__captured_secrets = environment_secrets()
 
     async def generate(self, request: ModelRequest) -> ModelResponse:
         options: dict[str, Any] = {
@@ -85,7 +86,7 @@ class OllamaModelProvider:
         if not isinstance(model, str) or not isinstance(finish, str):
             raise ProviderError("Ollama returned invalid response metadata")
         identifier = optional_identifier(
-            body.get("request_id", response.request_id), self.__captured_secret
+            body.get("request_id", response.request_id), *self.__captured_secrets
         )
         usage = usage_record(
             input_tokens=optional_count(body, "prompt_eval_count"),
@@ -98,8 +99,10 @@ class OllamaModelProvider:
         )
         return ModelResponse(
             provider="ollama",
-            model=redact(model, self.__captured_secret),
-            text=redact(message["content"], self.__captured_secret),
+            model=redact(model, *self.__captured_secrets),
+            text=redact(message["content"], *self.__captured_secrets),
             usage=usage,
-            finish_reason=redact(finish, self.__captured_secret),
+            finish_reason=redact(finish, *self.__captured_secrets),
+            reported_model=optional_identifier(body.get("model"), *self.__captured_secrets),
+            rate_limits=response.rate_limits,
         )

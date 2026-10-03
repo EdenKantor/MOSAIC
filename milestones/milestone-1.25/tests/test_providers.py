@@ -12,15 +12,24 @@ from mosaic.core.models import (
     ModelRequest,
     ModelResponse,
     Observation,
+    ProviderRateLimits,
 )
 from mosaic.core.teacher import TeacherCapability, TeacherUnavailable
 from mosaic.providers.factory import provider_factory
 from mosaic.providers.fake import FakeModelProvider
+from mosaic.providers.gemini import GeminiModelProvider
 from mosaic.providers.groq import GroqModelProvider
-from mosaic.providers.http import HttpResponse, ProviderError, StdlibHttpTransport, redact
+from mosaic.providers.http import (
+    HttpResponse,
+    ProviderError,
+    StdlibHttpTransport,
+    groq_rate_limits,
+    redact,
+)
 from mosaic.providers.ollama import OllamaModelProvider
 
 FAKE_SECRET = "TEST_ONLY_GROQ_CREDENTIAL_123"
+FAKE_GEMINI_SECRET = "TEST_ONLY_GEMINI_CREDENTIAL_789"
 
 
 class MockTransport:
@@ -107,10 +116,13 @@ def groq_body(**updates: Any) -> dict[str, Any]:
 @pytest.fixture(autouse=True)
 def isolated_provider_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("GROQ_API_KEY", FAKE_SECRET)
+    monkeypatch.setenv("GEMINI_API_KEY", FAKE_GEMINI_SECRET)
     monkeypatch.delenv("OLLAMA_HOST", raising=False)
 
 
-def generate(provider: OllamaModelProvider | GroqModelProvider, **updates: Any) -> ModelResponse:
+def generate(
+    provider: OllamaModelProvider | GroqModelProvider | GeminiModelProvider, **updates: Any
+) -> ModelResponse:
     return asyncio.run(provider.generate(request(**updates)))
 
 
@@ -290,7 +302,7 @@ def test_all_returned_strings_are_redacted_with_captured_and_current_keys(
     monkeypatch.setenv("GROQ_API_KEY", updated_secret)
     encoded = generate(provider).model_dump_json()
     assert FAKE_SECRET not in encoded and updated_secret not in encoded
-    assert encoded.count("[REDACTED]") == 8
+    assert encoded.count("[REDACTED]") == 10
 
 
 def test_public_redaction_helper_supports_cli_errors() -> None:
@@ -377,9 +389,9 @@ class FakeHttpResponse:
     def getheader(self, name: str) -> str | None:
         return "request-header-1" if name == "x-request-id" else None
 
-    def read(self) -> bytes:
+    def read(self, amount: int | None = None) -> bytes:
         self.reads += 1
-        return self.content
+        return self.content if amount is None else self.content[:amount]
 
 
 def test_stdlib_transport_uses_fresh_connections_and_exactly_one_post(
@@ -420,7 +432,7 @@ def test_stdlib_transport_uses_fresh_connections_and_exactly_one_post(
 
 
 @pytest.mark.parametrize("status", [307, 401, 429])
-def test_stdlib_transport_never_reads_redirect_or_error_body(
+def test_stdlib_transport_discards_error_body_and_never_reads_redirects(
     status: int, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     response = FakeHttpResponse(status, FAKE_SECRET.encode())
@@ -442,4 +454,405 @@ def test_stdlib_transport_never_reads_redirect_or_error_body(
     monkeypatch.setattr("mosaic.providers.http.http.client.HTTPConnection", FakeConnection)
     result = asyncio.run(StdlibHttpTransport().post_json("http://localhost/api/chat", {}, {}, 5))
     assert result.status == status and result.body == {}
-    assert requests == ["POST"] and response.reads == 0
+    assert requests == ["POST"]
+    assert response.reads == (0 if status == 307 else 1)
+    assert FAKE_SECRET not in repr(result)
+
+
+def gemini_body(**updates: Any) -> dict[str, Any]:
+    return {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [
+                        {
+                            "text": "PRIVATE_THOUGHT_TEXT",
+                            "thought": True,
+                            "thoughtSignature": "PRIVATE_SIGNATURE",
+                        },
+                        {"text": '{"name":"wait"}'},
+                    ]
+                },
+                "finishReason": "STOP",
+            }
+        ],
+        "usageMetadata": {
+            "promptTokenCount": 100,
+            "candidatesTokenCount": 25,
+            "thoughtsTokenCount": 7,
+            "cachedContentTokenCount": 40,
+            "totalTokenCount": 132,
+        },
+        "modelVersion": "configured-model-reported-version",
+        "responseId": "gemini-response-1",
+        **updates,
+    }
+
+
+def test_gemini_request_preserves_public_interface_and_common_json_mode() -> None:
+    transport = MockTransport(HttpResponse(200, gemini_body()))
+    response = generate(GeminiModelProvider(17, transport=transport), thinking_budget=0)
+    assert len(transport.calls) == 1
+    url, payload, headers, timeout = transport.calls[0]
+    assert url == (
+        "https://generativelanguage.googleapis.com/v1beta/models/configured-model:generateContent"
+    )
+    assert "?" not in url and FAKE_GEMINI_SECRET not in url
+    assert headers == {"x-goog-api-key": FAKE_GEMINI_SECRET} and timeout == 17
+    expected_system = request().system_prompt
+    assert payload["systemInstruction"] == {"parts": [{"text": expected_system}]}
+    visible = json.loads(payload["contents"][0]["parts"][0]["text"])
+    assert visible["goal"] == "visible-goal"
+    assert visible["observation"] == {"text": '{"position":1}'}
+    assert visible["available_actions"] == [{"name": "wait", "description": "Wait one step"}]
+    assert "model_role" not in visible["history"][0]
+    assert "agent_id" not in visible["history"][0]["observation"]
+    assert "snapshot" not in visible and "verification" not in visible
+    assert FAKE_GEMINI_SECRET not in json.dumps(payload) and FAKE_SECRET not in json.dumps(payload)
+    generation = payload["generationConfig"]
+    assert generation["temperature"] == 0 and generation["maxOutputTokens"] == 73
+    assert (
+        generation["candidateCount"] == 1 and generation["responseMimeType"] == "application/json"
+    )
+    assert "responseJsonSchema" not in generation and "responseSchema" not in generation
+    assert generation["thinkingConfig"] == {"includeThoughts": False, "thinkingBudget": 0}
+    assert response.text == '{"name":"wait"}'
+    assert "PRIVATE_THOUGHT_TEXT" not in response.model_dump_json()
+    assert "PRIVATE_SIGNATURE" not in response.model_dump_json()
+
+
+def test_gemini_thinking_level_is_explicit_and_budget_is_not_invented() -> None:
+    transport = MockTransport(HttpResponse(200, gemini_body()))
+    generate(GeminiModelProvider(transport=transport), thinking_level="minimal")
+    assert transport.calls[0][1]["generationConfig"]["thinkingConfig"] == {
+        "includeThoughts": False,
+        "thinkingLevel": "MINIMAL",
+    }
+
+
+def test_gemini_normalizes_reported_dimensions_without_double_counting_thoughts() -> None:
+    response = generate(
+        GeminiModelProvider(transport=MockTransport(HttpResponse(200, gemini_body())))
+    )
+    usage = response.usage
+    assert usage.input_tokens == 100 and usage.output_tokens == 25
+    assert usage.reasoning_tokens == 7 and usage.cached_input_tokens == 40
+    assert usage.provider_total_tokens == 132
+    assert usage.provider_request_id == "gemini-response-1"
+    assert usage.measurement == "provider"
+    assert usage.measurement_source == "gemini.generateContent.usageMetadata"
+    assert response.model == "configured-model"
+    assert response.reported_model == "configured-model-reported-version"
+
+
+def test_gemini_missing_usage_stays_unknown_and_does_not_count_thought_text() -> None:
+    response = generate(
+        GeminiModelProvider(
+            transport=MockTransport(
+                HttpResponse(
+                    200, gemini_body(usageMetadata=None, responseId=None, modelVersion=None)
+                )
+            )
+        )
+    )
+    usage = response.usage
+    assert usage.input_tokens is usage.output_tokens is usage.reasoning_tokens is None
+    assert usage.cached_input_tokens is usage.provider_total_tokens is None
+    assert usage.provider_request_id is None
+    assert usage.measurement == "unavailable" and response.reported_model is None
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "promptTokenCount",
+        "candidatesTokenCount",
+        "thoughtsTokenCount",
+        "cachedContentTokenCount",
+        "totalTokenCount",
+    ],
+)
+@pytest.mark.parametrize("invalid", [True, -1, 1.5, "7"])
+def test_gemini_malformed_usage_is_rejected_without_raw_exception_context(
+    field: str,
+    invalid: Any,
+) -> None:
+    body = gemini_body()
+    body["usageMetadata"][field] = invalid
+    transport = MockTransport(HttpResponse(200, body))
+    with pytest.raises(ProviderError, match="invalid token usage") as error:
+        generate(GeminiModelProvider(transport=transport))
+    assert len(transport.calls) == 1
+    assert error.value.__context__ is None and error.value.category == "invalid_response"
+
+
+@pytest.mark.parametrize(
+    "status,category",
+    [
+        (429, "rate_limit"),
+        (500, "server_error"),
+        (503, "server_error"),
+        (504, "timeout"),
+        (307, "redirect"),
+    ],
+)
+def test_gemini_http_failures_are_sanitized_and_stop_without_retry(
+    status: int, category: str
+) -> None:
+    transport = MockTransport(HttpResponse(status, {"error": {"message": FAKE_GEMINI_SECRET}}))
+    with pytest.raises(ProviderError) as error:
+        generate(GeminiModelProvider(transport=transport))
+    assert len(transport.calls) == 1
+    assert error.value.category == category and error.value.http_status == status
+    assert error.value.stop_batch and error.value.__context__ is None
+    assert FAKE_GEMINI_SECRET not in str(error.value)
+
+
+@pytest.mark.parametrize(
+    "hint,category",
+    [
+        ("quota exhausted", "quota"),
+        ("billing required", "billing"),
+        ("payment required", "payment"),
+        ("insufficient credit", "insufficient_credit"),
+        ("free-tier unavailable", "free_tier_unavailable"),
+    ],
+)
+def test_free_only_failures_emit_only_safe_category_and_stop_batch(
+    hint: str, category: str
+) -> None:
+    transport = MockTransport(
+        HttpResponse(403, {"error": {"message": f"{hint} {FAKE_GEMINI_SECRET}"}})
+    )
+    with pytest.raises(ProviderError) as error:
+        generate(GeminiModelProvider(transport=transport))
+    assert error.value.category == category and error.value.stop_batch
+    assert error.value.http_status == 403 and error.value.__context__ is None
+    assert FAKE_GEMINI_SECRET not in str(error.value) and len(transport.calls) == 1
+
+
+@pytest.mark.parametrize("machine", [None, "rate_limit_exceeded"])
+def test_429_token_limit_with_billing_link_or_upgrade_advice_stays_rate_limit(
+    machine: str | None,
+) -> None:
+    error_body = {
+        "error": {
+            "message": (
+                "Token limit reached. Visit https://console.groq.com/settings/billing "
+                "or upgrade to a paid tier for higher limits."
+            ),
+            "code": machine,
+        }
+    }
+    transport = MockTransport(HttpResponse(429, error_body))
+    with pytest.raises(ProviderError) as error:
+        generate(GroqModelProvider(transport=transport))
+    assert error.value.category == "rate_limit" and error.value.http_status == 429
+    assert error.value.stop_batch and len(transport.calls) == 1
+
+
+def test_429_explicit_billing_requirement_remains_fatal_billing_category() -> None:
+    transport = MockTransport(
+        HttpResponse(429, {"error": {"message": "Billing is required to use this model."}})
+    )
+    with pytest.raises(ProviderError) as error:
+        generate(GroqModelProvider(transport=transport))
+    assert error.value.category == "billing" and error.value.stop_batch
+    assert len(transport.calls) == 1
+
+
+@pytest.mark.parametrize(
+    "machine,category",
+    [
+        ("RESOURCE_EXHAUSTED", "quota"),
+        ("billing_required", "billing"),
+        ("free_tier_unavailable", "free_tier_unavailable"),
+        ("insufficient_credit", "insufficient_credit"),
+    ],
+)
+def test_machine_error_codes_remain_authoritative_despite_generic_billing_advice(
+    machine: str, category: str
+) -> None:
+    transport = MockTransport(
+        HttpResponse(
+            429,
+            {"error": {"status": machine, "message": "See billing settings for higher limits."}},
+        )
+    )
+    with pytest.raises(ProviderError) as error:
+        generate(GroqModelProvider(transport=transport))
+    assert error.value.category == category and error.value.stop_batch
+
+
+def test_gemini_timeout_is_classified_without_exception_chain_or_retry() -> None:
+    transport = MockTransport(TimeoutError(FAKE_GEMINI_SECRET))
+    with pytest.raises(ProviderError) as error:
+        generate(GeminiModelProvider(transport=transport))
+    assert error.value.category == "timeout" and error.value.stop_batch
+    assert error.value.http_status is None and error.value.__context__ is None
+    assert len(transport.calls) == 1 and FAKE_GEMINI_SECRET not in str(error.value)
+
+
+def test_gemini_missing_credential_stops_before_transport(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("GEMINI_API_KEY")
+    transport = MockTransport(HttpResponse(200, {}))
+    with pytest.raises(ProviderError, match="required in the environment") as error:
+        GeminiModelProvider(transport=transport)
+    assert error.value.category == "authentication" and error.value.stop_batch
+    assert transport.calls == []
+
+
+def test_gemini_response_redacts_captured_and_current_credentials_for_both_providers(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    current_groq = "TEST_ONLY_ROTATED_GROQ_222"
+    current_gemini = "TEST_ONLY_ROTATED_GEMINI_333"
+    echo = ":".join((FAKE_SECRET, FAKE_GEMINI_SECRET, current_groq, current_gemini))
+    body = gemini_body(
+        candidates=[{"content": {"parts": [{"text": echo}]}, "finishReason": echo}],
+        responseId=echo,
+        modelVersion=echo,
+    )
+    provider = GeminiModelProvider(transport=MockTransport(HttpResponse(200, body)))
+    monkeypatch.setenv("GROQ_API_KEY", current_groq)
+    monkeypatch.setenv("GEMINI_API_KEY", current_gemini)
+    encoded = generate(provider).model_dump_json()
+    assert all(
+        secret not in encoded
+        for secret in (FAKE_SECRET, FAKE_GEMINI_SECRET, current_groq, current_gemini)
+    )
+    assert encoded.count("[REDACTED]") == 16
+
+
+def test_public_redaction_helper_removes_both_provider_keys() -> None:
+    assert redact(f"{FAKE_SECRET} {FAKE_GEMINI_SECRET}") == "[REDACTED] [REDACTED]"
+
+
+def test_factory_includes_gemini_without_network_dispatch() -> None:
+    assert isinstance(
+        provider_factory(ModelConfig(provider="gemini", model="configured-model")),
+        GeminiModelProvider,
+    )
+
+
+def test_gemini_withdrawn_capability_blocks_transport() -> None:
+    transport = MockTransport(HttpResponse(200, gemini_body()))
+    provider = GeminiModelProvider(transport=transport)
+    capability = TeacherCapability(provider, TeacherAccess.WITHDRAWN)
+    with pytest.raises(TeacherUnavailable):
+        asyncio.run(capability.generate(request()))
+    assert transport.calls == []
+
+
+def test_groq_rate_limits_normalize_numeric_headers_and_keep_missing_fields_unknown() -> None:
+    limits = groq_rate_limits(
+        {
+            "x-ratelimit-limit-requests": "1000",
+            "x-ratelimit-limit-tokens": "8000",
+            "x-ratelimit-remaining-requests": "0",
+            "x-ratelimit-remaining-tokens": "7900",
+            "x-ratelimit-reset-requests": "1h2m59.56s",
+            "x-ratelimit-reset-tokens": "7.66s",
+            "unknown-sensitive-header": FAKE_SECRET,
+        }
+    )
+    assert limits == ProviderRateLimits(
+        request_limit=1000,
+        token_limit=8000,
+        remaining_requests=0,
+        remaining_tokens=7900,
+        request_reset_seconds=3779.56,
+        token_reset_seconds=7.66,
+    )
+    partial = groq_rate_limits({"x-ratelimit-remaining-tokens": "0"})
+    assert partial == ProviderRateLimits(remaining_tokens=0)
+    assert groq_rate_limits({}) is None
+
+
+@pytest.mark.parametrize("invalid", ["-1", "True", "1.5", "1e3", "", FAKE_SECRET])
+def test_groq_malformed_count_headers_stay_unknown(invalid: str) -> None:
+    assert groq_rate_limits({"x-ratelimit-remaining-tokens": invalid}) is None
+
+
+def test_captured_numeric_credential_cannot_become_quota_metadata() -> None:
+    assert (
+        groq_rate_limits(
+            {
+                "x-ratelimit-limit-requests": "1234567890",
+                "x-ratelimit-reset-tokens": "1234567890s",
+            },
+            "1234567890",
+        )
+        is None
+    )
+
+
+@pytest.mark.parametrize(
+    "invalid", ["-1s", "1e3s", "nan", "inf", "2", "1s1s", "1s2m", FAKE_GEMINI_SECRET]
+)
+def test_groq_malformed_duration_headers_stay_unknown(invalid: str) -> None:
+    assert groq_rate_limits({"x-ratelimit-reset-tokens": invalid}) is None
+
+
+@pytest.mark.parametrize("duration,seconds", [("0s", 0.0), ("250ms", 0.25), ("1d2h", 93600.0)])
+def test_groq_reset_duration_handles_reported_zero_milliseconds_and_days(
+    duration: str, seconds: float
+) -> None:
+    limits = groq_rate_limits({"x-ratelimit-reset-tokens": duration})
+    assert limits is not None and limits.token_reset_seconds == seconds
+
+
+def test_groq_forwards_reported_quotas_without_calculating_them_from_usage() -> None:
+    limits = ProviderRateLimits(
+        request_limit=1000, remaining_requests=997, token_limit=8000, remaining_tokens=500
+    )
+    transport = MockTransport(HttpResponse(200, groq_body(), rate_limits=limits))
+    response = generate(GroqModelProvider(transport=transport))
+    assert response.rate_limits == limits and len(transport.calls) == 1
+    assert response.reported_model == "configured-model"
+    absent = generate(GroqModelProvider(transport=MockTransport(HttpResponse(200, groq_body()))))
+    assert absent.rate_limits is None
+
+
+def test_stdlib_transport_keeps_only_normalized_groq_quota_headers(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    requested_headers: list[str] = []
+    requests: list[str] = []
+
+    class QuotaResponse(FakeHttpResponse):
+        def getheader(self, name: str) -> str | None:
+            requested_headers.append(name)
+            return {
+                "x-request-id": FAKE_SECRET,
+                "x-ratelimit-limit-requests": "1000",
+                "x-ratelimit-remaining-tokens": "12",
+                "x-ratelimit-reset-tokens": "7.66s",
+                "authorization": FAKE_GEMINI_SECRET,
+            }.get(name)
+
+    class FakeConnection:
+        def __init__(self, host: str, port: int | None, *, timeout: float) -> None:
+            assert host == "api.groq.com"
+
+        def request(self, method: str, path: str, *, body: bytes, headers: dict[str, str]) -> None:
+            requests.append(method)
+
+        def getresponse(self) -> QuotaResponse:
+            return QuotaResponse(200, b'{"ok":true}')
+
+        def close(self) -> None:
+            pass
+
+    monkeypatch.setattr("mosaic.providers.http.http.client.HTTPSConnection", FakeConnection)
+    result = asyncio.run(
+        StdlibHttpTransport().post_json(
+            "https://api.groq.com/openai/v1/chat/completions", {}, {}, 5
+        )
+    )
+    assert requests == ["POST"] and "authorization" not in requested_headers
+    assert result.request_id == "[REDACTED]"
+    assert result.rate_limits == ProviderRateLimits(
+        request_limit=1000, remaining_tokens=12, token_reset_seconds=7.66
+    )
+    assert FAKE_SECRET not in repr(result) and FAKE_GEMINI_SECRET not in repr(result)

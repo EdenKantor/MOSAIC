@@ -3,6 +3,7 @@
 from mosaic.core.config import ModelConfig
 from mosaic.providers.base import ModelProvider
 from mosaic.providers.fake import FakeModelProvider
+from mosaic.providers.gemini import GeminiModelProvider
 from mosaic.providers.groq import GroqModelProvider
 from mosaic.providers.ollama import OllamaModelProvider
 
@@ -14,4 +15,6 @@ def provider_factory(config: ModelConfig) -> ModelProvider:
         return OllamaModelProvider(config.timeout_seconds)
     if config.provider == "groq":
         return GroqModelProvider(config.timeout_seconds)
+    if config.provider == "gemini":
+        return GeminiModelProvider(config.timeout_seconds)
     raise ValueError("Unsupported provider configuration")

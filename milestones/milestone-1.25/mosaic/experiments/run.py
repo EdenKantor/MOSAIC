@@ -6,11 +6,17 @@ from uuid import uuid4
 
 from pydantic import ValidationError
 
-from mosaic.core.config import TeacherAccess, load_calibration_config, load_config
+from mosaic.core.config import (
+    TeacherAccess,
+    load_calibration_config,
+    load_config,
+    load_selection_config,
+)
 from mosaic.core.models import ModelRequest, ModelResponse
 from mosaic.core.teacher import TeacherCapability, TeacherUnavailable
 from mosaic.experiments.calibration import CalibrationRunner, calibration_environment, preflight
 from mosaic.experiments.runner import ExperimentRunner
+from mosaic.experiments.selection import SelectionReport, SelectionRunner, selection_preflight
 from mosaic.providers.factory import provider_factory
 from mosaic.providers.http import ProviderError, redact
 
@@ -27,11 +33,46 @@ def main(argv: list[str] | None = None) -> int:
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--config", type=Path)
     source.add_argument("--calibration-config", type=Path)
+    source.add_argument("--selection-config", type=Path)
     parser.add_argument("--output-dir", "--output", dest="output_dir", type=Path)
     parser.add_argument("--preflight", action="store_true")
     parser.add_argument("--confirm-pilot-reviewed", action="store_true")
+    parser.add_argument("--confirm-free-tier", action="store_true")
+    parser.add_argument("--candidate", action="append")
+    parser.add_argument("--family", action="append")
+    parser.add_argument("--prior-summary", action="append", type=Path, default=[])
     args = parser.parse_args(argv)
     try:
+        if args.selection_config:
+            selection = load_selection_config(args.selection_config)
+            if args.preflight:
+                readiness_selection = selection_preflight(selection)
+                for check in readiness_selection.checks:
+                    print(f"{'passed' if check.passed else 'failed'}: {check.name}: {check.detail}")
+                print("Selection preflight made zero network requests and zero inference calls.")
+                return 0 if readiness_selection.passed else 2
+            prior = tuple(
+                SelectionReport.model_validate_json(path.read_text(encoding="utf-8"))
+                for path in args.prior_summary
+            )
+            output = args.output_dir or Path("runs") / selection.selection_id / str(uuid4())
+            selected = asyncio.run(
+                SelectionRunner().run(
+                    selection,
+                    output,
+                    confirm_free_tier=args.confirm_free_tier,
+                    candidate_names=tuple(args.candidate) if args.candidate else None,
+                    family_names=tuple(args.family) if args.family else None,
+                    prior_reports=prior,
+                )
+            )
+            print(f"{selected.status}: {len(selected.outcomes)} independent diagnostic arms")
+            print("No empirical Weak/Teacher pair is automatically selected.")
+            print(f"Report: {(output / 'report.md').resolve()}")
+            print(f"Summary: {(output / 'summary.json').resolve()}")
+            return 0 if selected.status == "completed" else 2
+        if args.candidate or args.family or args.prior_summary:
+            raise ValueError("Candidate batch controls require --selection-config")
         if args.calibration_config:
             calibration = load_calibration_config(args.calibration_config)
             if args.preflight:
@@ -49,7 +90,10 @@ def main(argv: list[str] | None = None) -> int:
             output = args.output_dir or Path("runs") / calibration.calibration_id / str(uuid4())
             report = asyncio.run(
                 CalibrationRunner().run(
-                    calibration, output, confirm_pilot_reviewed=args.confirm_pilot_reviewed
+                    calibration,
+                    output,
+                    confirm_pilot_reviewed=args.confirm_pilot_reviewed,
+                    confirm_free_tier=args.confirm_free_tier,
                 )
             )
             print(
@@ -71,9 +115,17 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Report: {(output / 'report.md').resolve()}")
             print(f"Summary: {(output / 'summary.json').resolve()}")
             return 0 if report.status == "completed" else 2
-        if args.preflight or args.confirm_pilot_reviewed:
+        if args.preflight or args.confirm_pilot_reviewed or args.confirm_free_tier:
             raise ValueError("Calibration flags require --calibration-config")
         config = load_config(args.config)
+        if config.model.provider != "fake" or (
+            config.teacher is not None
+            and config.teacher.access == TeacherAccess.AVAILABLE
+            and config.teacher.model.provider != "fake"
+        ):
+            raise ValueError(
+                "Real inference requires the guarded selection or calibration protocol"
+            )
         environment = calibration_environment(config)
         provider = provider_factory(config.model)
         teacher = None

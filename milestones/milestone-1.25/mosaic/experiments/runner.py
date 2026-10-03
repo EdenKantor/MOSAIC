@@ -46,6 +46,7 @@ from mosaic.core.routing import BoundedFailurePolicy, EscalationPolicy, RoutingS
 from mosaic.core.teacher import TeacherCapability, TeacherUnavailable
 from mosaic.environments.base import EnvironmentAdapter
 from mosaic.providers.base import ModelProvider
+from mosaic.providers.http import ProviderError
 
 
 @dataclass(frozen=True)
@@ -53,6 +54,14 @@ class RunArtifacts:
     trace_path: Path
     summary_path: Path
     summary: RunSummary
+
+
+class InferenceBatchStopped(RuntimeError):
+    """A proactive budget guard blocked dispatch; no physical request was attempted."""
+
+    def __init__(self, reason: str) -> None:
+        super().__init__(reason)
+        self.reason = reason
 
 
 async def _invoke(
@@ -64,6 +73,9 @@ async def _invoke(
     recorder: EventRecorder,
     step: int,
 ) -> ModelResponse:
+    guard = getattr(provider, "before_dispatch", None)
+    if callable(guard):
+        await guard(request)
     call_index = ledger.model_called(role)
     recorder.record(
         ModelCalled(
@@ -85,7 +97,10 @@ async def _invoke(
                 model=identity.model,
                 latency_ms=latency_ms,
                 error_type=type(error).__name__,
-                message=str(error),
+                message="Provider inference request failed",
+                provider_category=error.category if isinstance(error, ProviderError) else None,
+                http_status=error.http_status if isinstance(error, ProviderError) else None,
+                stop_batch=error.stop_batch if isinstance(error, ProviderError) else False,
             ),
             step,
         )
@@ -143,6 +158,11 @@ class ExperimentRunner:
         verification: VerificationResult | None = None
         snapshot: EnvironmentSnapshot | None = None
         steps = escalations = blocked_escalations = 0
+        invalid_json = invalid_action = provider_failures = 0
+        provider_failure_category: str | None = None
+        provider_http_status: int | None = None
+        provider_stop_batch = False
+        batch_stop_reason: str | None = None
         role: ModelRole = "weak"
         phase: Literal["attempt", "recovery"] = "attempt"
         phase_steps = recoveries_started = consecutive_failures = 0
@@ -236,7 +256,13 @@ class ExperimentRunner:
                     try:
                         action = agent.parse(response.text, actions)
                     except ValueError as error:
-                        accepted, feedback = False, str(error)
+                        if str(error).startswith("Action is not advertised:"):
+                            invalid_action += 1
+                            feedback = "Action is not advertised"
+                        else:
+                            invalid_json += 1
+                            feedback = "Action JSON or schema is invalid"
+                        accepted = False
                         recorder.record(
                             ActionRejected(
                                 proposal=response.text,
@@ -265,6 +291,7 @@ class ExperimentRunner:
                                 step,
                             )
                         else:
+                            invalid_action += 1
                             recorder.record(
                                 ActionRejected(
                                     proposal=response.text,
@@ -380,11 +407,25 @@ class ExperimentRunner:
             else:
                 recorder.record(TaskFailed(reason=reason, verification=verification), steps)
         except Exception as error:
-            status, reason = "error", f"{stage}: {type(error).__name__}: {error}"
+            status, reason = "error", f"{stage}: runtime_failure"
+            if isinstance(error, InferenceBatchStopped):
+                batch_stop_reason = error.reason
+                reason = f"inference_batch_stopped: {error.reason}"
+            elif stage == "model_generate":
+                provider_failures += 1
+                if isinstance(error, ProviderError):
+                    provider_failure_category = error.category
+                    provider_http_status = error.http_status
+                    provider_stop_batch = error.stop_batch
+                    reason = f"provider_failure: {error.category}"
             recorder.record(
-                RunErrored(stage=stage, error_type=type(error).__name__, message=str(error)), steps
+                RunErrored(
+                    stage=stage,
+                    error_type=type(error).__name__,
+                    message="Experiment operation failed",
+                ),
+                steps,
             )
-            recorder.record(TaskFailed(reason=reason, verification=verification), steps)
         finally:
             try:
                 budget = ledger.totals((time.perf_counter() - started) * 1000)
@@ -403,6 +444,13 @@ class ExperimentRunner:
                     else None,
                     escalations=escalations,
                     blocked_escalations=blocked_escalations,
+                    invalid_json=invalid_json,
+                    invalid_action=invalid_action,
+                    provider_failures=provider_failures,
+                    provider_failure_category=provider_failure_category,
+                    provider_http_status=provider_http_status,
+                    provider_stop_batch=provider_stop_batch,
+                    batch_stop_reason=batch_stop_reason,
                 )
                 recorder.record(EpisodeFinished(budget=budget, snapshot=snapshot), steps)
                 recorder.record(ExperimentFinished(summary=summary), steps)

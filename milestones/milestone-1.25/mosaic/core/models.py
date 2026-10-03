@@ -116,6 +116,17 @@ class ModelRequest(FrozenModel):
     thinking: bool | None = None
     reasoning_effort: Literal["low", "medium", "high"] | None = None
     context_window: int | None = Field(default=None, gt=0)
+    thinking_budget: int | None = Field(default=None, ge=0)
+    thinking_level: Literal["minimal", "low", "medium", "high"] | None = None
+
+
+class ProviderRateLimits(FrozenModel):
+    request_limit: int | None = Field(default=None, ge=0)
+    token_limit: int | None = Field(default=None, ge=0)
+    remaining_requests: int | None = Field(default=None, ge=0)
+    remaining_tokens: int | None = Field(default=None, ge=0)
+    request_reset_seconds: float | None = Field(default=None, ge=0)
+    token_reset_seconds: float | None = Field(default=None, ge=0)
 
 
 class ModelResponse(FrozenModel):
@@ -124,3 +135,5 @@ class ModelResponse(FrozenModel):
     text: str
     usage: TokenUsage
     finish_reason: str
+    reported_model: str | None = None
+    rate_limits: ProviderRateLimits | None = None

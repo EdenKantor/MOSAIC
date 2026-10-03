@@ -44,6 +44,8 @@ class Agent:
             thinking=identity.thinking,
             reasoning_effort=identity.reasoning_effort,
             context_window=identity.context_window,
+            thinking_budget=identity.thinking_budget,
+            thinking_level=identity.thinking_level,
         )
 
     def parse(self, text: str, actions: tuple[ActionSpec, ...]) -> Action:

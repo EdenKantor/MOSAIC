@@ -1,15 +1,17 @@
 """Independent paired capability measurements, with no escalation or skill memory."""
 
+import asyncio
 import hashlib
 import http.client
 import json
 import os
+import statistics
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from importlib.metadata import PackageNotFoundError, distribution
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, NoReturn
 from urllib.parse import urlsplit
 
 from pydantic import Field
@@ -22,6 +24,7 @@ from mosaic.core.config import (
     CalibrationFamily,
     ExperimentConfig,
     ModelConfig,
+    ProviderRequestLimit,
 )
 from mosaic.core.events import (
     ActionDispatched,
@@ -35,13 +38,19 @@ from mosaic.core.events import (
     RunSummary,
     read_events,
 )
-from mosaic.core.models import FrozenModel, ModelRole
+from mosaic.core.models import (
+    FrozenModel,
+    ModelRequest,
+    ModelResponse,
+    ModelRole,
+    ProviderRateLimits,
+)
 from mosaic.environments.base import EnvironmentAdapter
 from mosaic.environments.fake import FakeEnvironment
-from mosaic.experiments.runner import ExperimentRunner
+from mosaic.experiments.runner import ExperimentRunner, InferenceBatchStopped
 from mosaic.providers.base import ModelProvider
 from mosaic.providers.factory import provider_factory
-from mosaic.providers.http import visible_messages
+from mosaic.providers.http import ProviderError, visible_messages
 from mosaic.providers.ollama import _local_endpoint
 
 ROLES: tuple[ModelRole, ...] = ("weak", "teacher")
@@ -53,6 +62,33 @@ class InitialCondition(FrozenModel):
     visible_prompt_sha256: str
 
 
+class EpisodeMetrics(FrozenModel):
+    invalid_json: int = Field(default=0, ge=0)
+    invalid_action: int = Field(default=0, ge=0)
+    provider_failures: int = Field(default=0, ge=0)
+    provider_failure_category: str | None = None
+    provider_http_status: int | None = None
+    provider_stop_batch: bool = False
+    step_cap: bool = False
+    task_outcome: Literal["succeeded", "failed", "unknown"] = "unknown"
+    batch_stop_reason: str | None = None
+
+
+class ProviderBudget(FrozenModel):
+    provider: str
+    request_upper_bound: int = Field(ge=0)
+    budget: BudgetTotals
+    stopped_reason: str | None = None
+    budget_complete: bool = True
+    request_dispatch_limit: int | None = None
+    prior_recorded_calls: int = Field(default=0, ge=0)
+    last_request_at: float | None = None
+    latest_rate_limits: ProviderRateLimits | None = None
+    rate_limits_at: float | None = None
+    unavailable_models: tuple[str, ...] = ()
+    provider_stop_batch: bool | None = None
+
+
 class CalibrationArm(FrozenModel):
     family: str
     task: str
@@ -60,7 +96,7 @@ class CalibrationArm(FrozenModel):
     role: ModelRole
     provider: str
     model: str
-    status: Literal["succeeded", "failed", "error"]
+    status: Literal["succeeded", "failed", "error", "skipped"]
     reason: str
     steps: int = Field(ge=0)
     initial: InitialCondition | None
@@ -71,6 +107,7 @@ class CalibrationArm(FrozenModel):
     summary: RunSummary | None
     trace_path: str | None
     trace_sha256: str | None
+    metrics: EpisodeMetrics = Field(default_factory=EpisodeMetrics)
     provider_cost: None = None
 
 
@@ -93,6 +130,16 @@ class CalibrationAggregate(FrozenModel):
     steps: int = Field(ge=0)
     budget: RoleBudgetTotals
     failure_reasons: tuple[str, ...]
+    success_rate: float | None = None
+    mean_steps: float | None = None
+    median_steps: float | None = None
+    environment_actions: int = Field(default=0, ge=0)
+    invalid_json: int = Field(default=0, ge=0)
+    invalid_action: int = Field(default=0, ge=0)
+    provider_failures: int = Field(default=0, ge=0)
+    parse_failure_rate: float | None = None
+    invalid_action_rate: float | None = None
+    step_cap_rate: float | None = None
     provider_cost: None = None
 
 
@@ -100,7 +147,7 @@ class CalibrationReport(FrozenModel):
     schema_version: Literal[1] = 1
     calibration_id: str
     stage: Literal["pilot", "expanded"]
-    status: Literal["completed", "error"]
+    status: Literal["completed", "incomplete", "error"]
     fixture_only: bool
     config: CalibrationConfig
     config_sha256: str
@@ -111,6 +158,8 @@ class CalibrationReport(FrozenModel):
     budget_complete: bool
     preparation_ms: float = Field(ge=0)
     wall_clock_ms: float = Field(ge=0)
+    provider_budgets: tuple[ProviderBudget, ...] = ()
+    paired_outcomes: tuple[tuple[str, int, str], ...] = ()
     provider_cost: None = None
 
 
@@ -135,6 +184,232 @@ class _PreparedArm:
     initial: InitialCondition | None
     preparation_ms: float
     error_reason: str | None
+
+
+class BatchController:
+    """Reserve episode bounds before inference and pause providers without retrying."""
+
+    def __init__(self, limits: tuple[ProviderRequestLimit, ...]) -> None:
+        self.limits: dict[str, ProviderRequestLimit] = {limit.provider: limit for limit in limits}
+        self.reserved: dict[str, int] = {}
+        self.episodes: dict[str, int] = {}
+        self.stopped: dict[str, str] = {}
+        self.last_request: dict[str, float] = {}
+        self.calls: dict[str, int] = {}
+        self.prior_calls: dict[str, int] = {}
+        self.known_total_tokens: dict[str, int] = {}
+        self.unknown_total_tokens: set[str] = set()
+        self.rate_limits: dict[str, ProviderRateLimits] = {}
+        self.rate_limits_at: dict[str, float] = {}
+        self.unavailable_models: set[tuple[str, str]] = set()
+
+    def admit(self, provider: str, max_steps: int, model: str | None = None) -> str | None:
+        if provider in self.stopped:
+            return "provider_batch_stopped"
+        if model is not None and (provider, model) in self.unavailable_models:
+            return "model_not_found"
+        limit = self.limits.get(provider)
+        if limit is not None:
+            episode_cap = limit.max_episodes if limit.quota_known else 1
+            if self.episodes.get(provider, 0) >= episode_cap:
+                return "provider_episode_batch_limit"
+            if self.calls.get(provider, 0) >= limit.max_requests:
+                return "provider_request_batch_limit"
+        self.reserved[provider] = self.reserved.get(provider, 0) + max_steps
+        self.episodes[provider] = self.episodes.get(provider, 0) + 1
+        return None
+
+    async def pace(self, provider: str) -> None:
+        limit = self.limits.get(provider)
+        interval = limit.min_interval_seconds if limit is not None else 0
+        remaining = self.last_request.get(provider, 0) + interval - time.time()
+        if remaining > 0:
+            await asyncio.sleep(remaining)
+
+    def stop(self, provider: str, reason: str) -> NoReturn:
+        self.stopped[provider] = reason
+        raise InferenceBatchStopped(reason)
+
+    async def before_dispatch(self, provider: str, request: ModelRequest) -> None:
+        limit = self.limits.get(provider)
+        if provider in self.stopped:
+            self.stop(provider, "provider_batch_stopped")
+        if (provider, request.model) in self.unavailable_models:
+            raise InferenceBatchStopped("model_not_found")
+        if limit is not None and self.calls.get(provider, 0) >= limit.max_requests:
+            self.stop(provider, "physical_request_batch_limit")
+        await self.pace(provider)
+        rates = self.rate_limits.get(provider)
+        if rates is not None:
+            if rates.remaining_requests == 0:
+                self.stop(provider, "provider_request_capacity")
+            for remaining, ceiling, reset, reason in (
+                (
+                    rates.remaining_requests,
+                    1,
+                    rates.request_reset_seconds,
+                    "provider_request_capacity",
+                ),
+                (
+                    rates.remaining_tokens,
+                    limit.request_token_ceiling
+                    if limit and limit.request_token_ceiling
+                    else request.max_output_tokens,
+                    rates.token_reset_seconds,
+                    "provider_token_capacity",
+                ),
+            ):
+                if remaining is not None and remaining < ceiling:
+                    elapsed = time.time() - self.rate_limits_at.get(provider, time.time())
+                    if reset is None:
+                        self.stop(provider, reason)
+                    if elapsed < reset:
+                        await asyncio.sleep(reset - elapsed)
+                    full = (
+                        rates.request_limit
+                        if reason == "provider_request_capacity"
+                        else rates.token_limit
+                    )
+                    if full is None or full < ceiling:
+                        self.stop(provider, reason)
+        if limit and limit.max_total_tokens is not None:
+            if provider in self.unknown_total_tokens or limit.request_token_ceiling is None:
+                self.stop(provider, "daily_token_capacity_unknown")
+            if (
+                self.known_total_tokens.get(provider, 0) + limit.request_token_ceiling
+                > limit.max_total_tokens
+            ):
+                self.stop(provider, "daily_token_envelope_limit")
+        self.calls[provider] = self.calls.get(provider, 0) + 1
+        self.last_request[provider] = time.time()
+
+    def responded(self, provider: str, response: ModelResponse) -> None:
+        total = response.usage.provider_total_tokens
+        if total is None:
+            self.unknown_total_tokens.add(provider)
+        else:
+            self.known_total_tokens[provider] = self.known_total_tokens.get(provider, 0) + total
+            limit = self.limits.get(provider)
+            if (
+                limit
+                and limit.request_token_ceiling is not None
+                and total > limit.request_token_ceiling
+            ):
+                self.stopped[provider] = "declared_token_ceiling_exceeded"
+        if response.rate_limits is not None:
+            self.rate_limits[provider] = response.rate_limits
+            self.rate_limits_at[provider] = time.time()
+
+    def previous(self, item: ProviderBudget) -> None:
+        self.prior_calls[item.provider] = (
+            self.prior_calls.get(item.provider, 0) + item.budget.model_calls
+        )
+        self.calls[item.provider] = self.calls.get(item.provider, 0) + item.budget.model_calls
+        self.known_total_tokens[item.provider] = (
+            self.known_total_tokens.get(item.provider, 0) + item.budget.known_provider_total_tokens
+        )
+        if item.budget.unknown_provider_total_calls:
+            self.unknown_total_tokens.add(item.provider)
+        if item.stopped_reason is not None and (
+            item.stopped_reason != "not_found" or item.provider_stop_batch is True
+        ):
+            self.stopped[item.provider] = item.stopped_reason
+        self.unavailable_models.update((item.provider, model) for model in item.unavailable_models)
+        if not item.budget_complete:
+            self.stopped[item.provider] = "budget_coverage_incomplete"
+        if item.last_request_at is not None:
+            self.last_request[item.provider] = max(
+                self.last_request.get(item.provider, 0), item.last_request_at
+            )
+        if item.latest_rate_limits is not None and (
+            item.rate_limits_at or 0
+        ) > self.rate_limits_at.get(item.provider, 0):
+            self.rate_limits[item.provider] = item.latest_rate_limits
+            self.rate_limits_at[item.provider] = item.rate_limits_at or 0
+
+    def observe(self, arm: CalibrationArm) -> None:
+        if not arm.budget_complete:
+            self.stopped[arm.provider] = "budget_coverage_incomplete"
+        elif (
+            arm.metrics.provider_failure_category == "not_found"
+            and not arm.metrics.provider_stop_batch
+        ) or arm.metrics.batch_stop_reason == "model_not_found":
+            self.unavailable_models.add((arm.provider, arm.model))
+        elif arm.metrics.provider_failures:
+            self.stopped[arm.provider] = (
+                arm.metrics.provider_failure_category or "provider_inference_failure"
+            )
+        elif arm.metrics.batch_stop_reason:
+            self.stopped[arm.provider] = arm.metrics.batch_stop_reason
+
+
+class _PacedProvider:
+    def __init__(self, provider: ModelProvider, identity: str, batch: BatchController) -> None:
+        self.provider, self.identity, self.batch = provider, identity, batch
+
+    async def before_dispatch(self, request: ModelRequest) -> None:
+        await self.batch.before_dispatch(self.identity, request)
+
+    async def generate(self, request: ModelRequest) -> ModelResponse:
+        response = await self.provider.generate(request)
+        self.batch.responded(self.identity, response)
+        return response
+
+
+def _episode_metrics(
+    summary: RunSummary | None, error: ProviderError | None, max_steps: int
+) -> EpisodeMetrics:
+    if summary is not None:
+        return EpisodeMetrics(
+            invalid_json=summary.invalid_json,
+            invalid_action=summary.invalid_action,
+            provider_failures=summary.provider_failures,
+            provider_failure_category=summary.provider_failure_category,
+            provider_http_status=summary.provider_http_status,
+            provider_stop_batch=summary.provider_stop_batch,
+            step_cap=summary.status == "failed" and summary.steps >= max_steps,
+            task_outcome=summary.status if summary.status != "error" else "unknown",
+            batch_stop_reason=summary.batch_stop_reason,
+        )
+    if error is not None:
+        return EpisodeMetrics(
+            provider_failures=1,
+            provider_failure_category=error.category,
+            provider_http_status=error.http_status,
+            provider_stop_batch=error.stop_batch,
+        )
+    return EpisodeMetrics()
+
+
+def provider_budgets(
+    arms: tuple[CalibrationArm, ...], batch: BatchController
+) -> tuple[ProviderBudget, ...]:
+    return tuple(
+        ProviderBudget(
+            provider=provider,
+            request_upper_bound=batch.reserved.get(provider, 0),
+            budget=_merge_budgets(
+                tuple(arm.budget for arm in arms if arm.provider == provider),
+                sum(arm.budget.wall_clock_ms for arm in arms if arm.provider == provider),
+            ),
+            stopped_reason=batch.stopped.get(provider),
+            budget_complete=all(arm.budget_complete for arm in arms if arm.provider == provider),
+            request_dispatch_limit=batch.limits[provider].max_requests
+            if provider in batch.limits
+            else None,
+            prior_recorded_calls=batch.prior_calls.get(provider, 0),
+            last_request_at=batch.last_request.get(provider),
+            latest_rate_limits=batch.rate_limits.get(provider),
+            rate_limits_at=batch.rate_limits_at.get(provider),
+            unavailable_models=tuple(
+                sorted(
+                    model for identity, model in batch.unavailable_models if identity == provider
+                )
+            ),
+            provider_stop_batch=provider in batch.stopped,
+        )
+        for provider in sorted({arm.provider for arm in arms})
+    )
 
 
 def _sha(value: object) -> str:
@@ -291,19 +566,36 @@ def _unknown_complete_totals(budget: BudgetTotals, roles: tuple[ModelRole, ...])
 
 
 def _aggregate(
-    family: str, role: ModelRole, arms: tuple[CalibrationArm, ...]
+    family: str,
+    role: ModelRole,
+    arms: tuple[CalibrationArm, ...],
+    all_arms: tuple[CalibrationArm, ...] = (),
 ) -> CalibrationAggregate:
     values = tuple(arm.budget.weak if role == "weak" else arm.budget.teacher for arm in arms)
+    calls = sum(arm.budget.model_calls for arm in arms)
+    invalid_json = sum(arm.metrics.invalid_json for arm in arms)
+    invalid_action = sum(arm.metrics.invalid_action for arm in arms)
+    succeeded = sum(arm.metrics.task_outcome == "succeeded" for arm in arms)
     return CalibrationAggregate(
         family=family,
         role=role,
         accepted_runs=len(arms),
-        succeeded=sum(arm.status == "succeeded" for arm in arms),
+        succeeded=succeeded,
         failed=sum(arm.status == "failed" for arm in arms),
         errors=sum(arm.status == "error" for arm in arms),
         steps=sum(arm.steps for arm in arms),
         budget=_merge_role(values, sum(value.wall_clock_ms for value in values)),
         failure_reasons=tuple(arm.reason for arm in arms if arm.status != "succeeded"),
+        success_rate=succeeded / len(arms) if arms else None,
+        mean_steps=statistics.mean(arm.steps for arm in arms) if arms else None,
+        median_steps=statistics.median(arm.steps for arm in arms) if arms else None,
+        environment_actions=sum(arm.budget.environment_actions for arm in arms),
+        invalid_json=invalid_json,
+        invalid_action=invalid_action,
+        provider_failures=sum(arm.metrics.provider_failures for arm in all_arms or arms),
+        parse_failure_rate=invalid_json / calls if calls else None,
+        invalid_action_rate=invalid_action / calls if calls else None,
+        step_cap_rate=sum(arm.metrics.step_cap for arm in arms) / len(arms) if arms else None,
     )
 
 
@@ -359,7 +651,13 @@ class CalibrationRunner:
         )
 
     async def _execute(
-        self, prepared: _PreparedArm, family: str, output: Path, root: Path, blocked: str | None
+        self,
+        prepared: _PreparedArm,
+        family: str,
+        output: Path,
+        root: Path,
+        blocked: str | None,
+        batch: BatchController | None = None,
     ) -> CalibrationArm:
         config = prepared.config
         summary: RunSummary | None = None
@@ -368,6 +666,7 @@ class CalibrationRunner:
         matches = False
         setup_ms = 0.0
         recording_error = False
+        provider_error: ProviderError | None = None
         reason = prepared.error_reason or blocked
         budget = BudgetLedger().totals(0)
         budget_complete = reason is not None
@@ -379,14 +678,18 @@ class CalibrationRunner:
                     provider = self.__model_factory(config.model)
                 finally:
                     setup_ms = (time.perf_counter() - constructed) * 1000
-                result = await ExperimentRunner(prepared.environment, provider).run(config, output)
+                active: ModelProvider = (
+                    _PacedProvider(provider, config.model.provider, batch) if batch else provider
+                )
+                result = await ExperimentRunner(prepared.environment, active).run(config, output)
                 summary, trace_path = result.summary, result.trace_path
                 budget = summary.budget
                 budget_complete = True
                 trace_hash = hashlib.sha256(trace_path.read_bytes()).hexdigest()
                 matches = _trace_initial_matches(trace_path, prepared.initial)
                 reason = summary.reason
-            except Exception:
+            except Exception as error:
+                provider_error = error if isinstance(error, ProviderError) else None
                 recording_error = True
                 reason = "arm_setup_or_recording_failed"
                 possible_trace = output / "events.jsonl"
@@ -410,7 +713,13 @@ class CalibrationRunner:
             role=config.agent_model_role,
             provider=config.model.provider,
             model=config.model.model,
-            status=summary.status if summary is not None and not recording_error else "error",
+            status=(
+                summary.status
+                if summary is not None and not recording_error
+                else "skipped"
+                if blocked is not None and not blocked.startswith("initial_")
+                else "error"
+            ),
             reason=reason or "arm_setup_or_recording_failed",
             steps=summary.steps if summary is not None else 0,
             initial=prepared.initial,
@@ -421,22 +730,62 @@ class CalibrationRunner:
             summary=summary,
             trace_path=str(trace_path.relative_to(root)).replace("\\", "/") if trace_path else None,
             trace_sha256=trace_hash,
+            metrics=_episode_metrics(summary, provider_error, config.max_steps),
         )
         output.mkdir(parents=True, exist_ok=True)
         (output / "arm.json").write_text(arm.model_dump_json(indent=2) + "\n", encoding="utf-8")
         return arm
 
     async def run(
-        self, config: CalibrationConfig, output: Path, *, confirm_pilot_reviewed: bool = False
+        self,
+        config: CalibrationConfig,
+        output: Path,
+        *,
+        confirm_pilot_reviewed: bool = False,
+        confirm_free_tier: bool = False,
     ) -> CalibrationReport:
         if config.stage == "expanded" and not confirm_pilot_reviewed:
             raise ValueError("Expanded calibration requires explicit pilot-review confirmation")
+        fixture = config.weak.provider == config.teacher.provider == "fake"
+        if not fixture:
+            if not confirm_free_tier:
+                raise ValueError("Real inference requires explicit free-tier-only confirmation")
+            if not config.selection_decision or not config.selection_evidence_sha256:
+                raise ValueError("Real calibration requires a recorded model selection decision")
+            providers = {config.weak.provider, config.teacher.provider}
+            if not providers <= {limit.provider for limit in config.request_limits}:
+                raise ValueError("Real calibration requires explicit per-provider request limits")
         started = time.perf_counter()
         output.mkdir(parents=True, exist_ok=False)
         (output / "config.json").write_text(
             config.model_dump_json(indent=2) + "\n", encoding="utf-8"
         )
         pairs: list[CalibrationPair] = []
+        batch = BatchController(config.request_limits)
+        planned = {
+            provider: sum(
+                family.max_steps * len(config.seeds)
+                for family in config.families
+                for candidate in (config.weak, config.teacher)
+                if candidate.provider == provider
+            )
+            for provider in {config.weak.provider, config.teacher.provider}
+        }
+        (output / "batch-plan.json").write_text(
+            json.dumps(
+                {
+                    "registered_request_upper_bounds": planned,
+                    "request_limits": [
+                        limit.model_dump(mode="json") for limit in config.request_limits
+                    ],
+                    "unknown_quota_episode_limit_per_provider": 1,
+                    "automatic_retries": 0,
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
         for family in config.families:
             if Path(family.name).name != family.name or family.name in {".", ".."}:
                 raise ValueError("Unsafe calibration family path")
@@ -445,27 +794,44 @@ class CalibrationRunner:
                 teacher = self._prepare(_arm_config(config, family, seed, "teacher"))
                 mismatch = _mismatch(weak, teacher)
                 weak_arm = await self._execute(
-                    weak, family.name, output / family.name / str(seed) / "weak", output, mismatch
+                    weak,
+                    family.name,
+                    output / family.name / str(seed) / "weak",
+                    output,
+                    mismatch
+                    or batch.admit(config.weak.provider, family.max_steps, config.weak.model),
+                    batch,
                 )
+                batch.observe(weak_arm)
                 teacher_arm = await self._execute(
                     teacher,
                     family.name,
                     output / family.name / str(seed) / "teacher",
                     output,
-                    mismatch,
+                    mismatch
+                    or batch.admit(config.teacher.provider, family.max_steps, config.teacher.model),
+                    batch,
                 )
+                batch.observe(teacher_arm)
                 comparable = (
                     mismatch is None
                     and weak_arm.initial_trace_matches
                     and teacher_arm.initial_trace_matches
                     and weak_arm.budget_complete
                     and teacher_arm.budget_complete
+                    and weak_arm.metrics.task_outcome != "unknown"
+                    and teacher_arm.metrics.task_outcome != "unknown"
                 )
                 comparison_reason = mismatch or "matched"
                 if mismatch is None and not comparable:
                     comparison_reason = (
                         "incomplete_arm_budget"
                         if not weak_arm.budget_complete or not teacher_arm.budget_complete
+                        else "provider_or_runtime_failure"
+                        if weak_arm.metrics.provider_failures
+                        or teacher_arm.metrics.provider_failures
+                        else "unexecuted_arm"
+                        if weak_arm.status == "skipped" or teacher_arm.status == "skipped"
                         else "recorded_initial_conditions_mismatch"
                     )
                 pairs.append(
@@ -487,6 +853,11 @@ class CalibrationRunner:
                     for pair in pairs
                     if pair.family == family.name and pair.comparable
                 ),
+                tuple(
+                    pair.weak if role == "weak" else pair.teacher
+                    for pair in pairs
+                    if pair.family == family.name
+                ),
             )
             for family in config.families
             for role in ROLES
@@ -505,11 +876,18 @@ class CalibrationRunner:
         report = CalibrationReport(
             calibration_id=config.calibration_id,
             stage=config.stage,
-            status="error"
+            status="incomplete"
+            if any(
+                arm.metrics.provider_failures
+                or arm.metrics.batch_stop_reason
+                or arm.status == "skipped"
+                for arm in arms
+            )
+            else "error"
             if any(not pair.comparable for pair in pairs)
             or any(arm.status == "error" for arm in arms)
             else "completed",
-            fixture_only=config.weak.provider == config.teacher.provider == "fake",
+            fixture_only=fixture,
             config=config,
             config_sha256=_sha(config.model_dump(mode="json")),
             pairs=tuple(pairs),
@@ -519,6 +897,18 @@ class CalibrationRunner:
             budget_complete=complete,
             preparation_ms=sum(arm.preparation_ms for arm in arms),
             wall_clock_ms=wall,
+            provider_budgets=provider_budgets(arms, batch),
+            paired_outcomes=tuple(
+                (
+                    pair.family,
+                    pair.seed,
+                    f"Weak {pair.weak.metrics.task_outcome} / "
+                    f"Teacher {pair.teacher.metrics.task_outcome}"
+                    if pair.comparable
+                    else "EXCLUDED — infrastructure or unmatched conditions",
+                )
+                for pair in pairs
+            ),
         )
         (output / "summary.json").write_text(
             report.model_dump_json(indent=2) + "\n", encoding="utf-8"
@@ -667,6 +1057,55 @@ def render_report(report: CalibrationReport) -> str:
             round(budget.wall_clock_ms, 3),
         )
         rows.append("| " + " | ".join(_cell(value) for value in values) + " |")
+    rows.extend(
+        [
+            "",
+            "Provider failures are excluded from capability denominators. "
+            "Registered but unexecuted arms remain visible; they are not task failures.",
+            "| Family | Arm | N matched | Success rate | Mean steps | Median steps | "
+            "Actions | Invalid action rate | Parse failure rate | "
+            "Step-cap rate | Provider failures |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for aggregate in report.aggregates:
+        rows.append(
+            "| "
+            + " | ".join(
+                _cell(value)
+                for value in (
+                    aggregate.family,
+                    aggregate.role,
+                    aggregate.accepted_runs,
+                    aggregate.success_rate,
+                    aggregate.mean_steps,
+                    aggregate.median_steps,
+                    aggregate.environment_actions,
+                    aggregate.invalid_action_rate,
+                    aggregate.parse_failure_rate,
+                    aggregate.step_cap_rate,
+                    aggregate.provider_failures,
+                )
+            )
+            + " |"
+        )
+    rows.extend(["", "| Family | Seed | Paired outcome |", "|---|---:|---|"])
+    for family_name, seed, outcome in report.paired_outcomes:
+        rows.append(f"| {_cell(family_name)} | {seed} | {_cell(outcome)} |")
+    rows.extend(
+        [
+            "",
+            "Token units from different providers are reported separately and are not assumed "
+            "scientifically interchangeable. No prices or paid fallback are inferred.",
+            "| Provider | Reserved request upper bound | Recorded calls | Stop reason |",
+            "|---|---:|---:|---|",
+        ]
+    )
+    for item in report.provider_budgets:
+        rows.append(
+            f"| {_cell(item.provider)} | {item.request_upper_bound} | "
+            f"{item.budget.model_calls} | {_cell(item.stopped_reason)} |"
+        )
     rows.extend(
         [
             "",

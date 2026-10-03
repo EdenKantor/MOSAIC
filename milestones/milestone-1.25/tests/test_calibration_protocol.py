@@ -47,6 +47,12 @@ def real_calibration_data() -> dict[str, Any]:
             {"name": "craft", "task": "make_wood_pickaxe", "max_steps": 10},
         ],
         "seeds": [42, 43],
+        "selection_decision": "OFFLINE protocol fixture; not an empirical model selection",
+        "selection_evidence_sha256": "0" * 64,
+        "request_limits": [
+            {"provider": provider, "max_requests": 1000, "quota_known": True, "max_episodes": 100}
+            for provider in ("ollama", "groq")
+        ],
     }
 
 
@@ -258,7 +264,7 @@ def test_paired_preparation_matches_actual_prompts_and_aggregates_unknown_usage(
         CalibrationRunner(
             environment_factory=lambda settings: PublicRulesEnvironment(settings.agent.agent_id),
             model_factory=IdentityPartialUsageProvider,
-        ).run(config, output)
+        ).run(config, output, confirm_free_tier=True)
     )
     assert result.status == "completed" and result.excluded_pairs == 0
     assert len(result.pairs) == len(config.families) * len(config.seeds) == 6

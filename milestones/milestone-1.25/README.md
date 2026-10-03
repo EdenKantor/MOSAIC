@@ -1,106 +1,74 @@
 # MOSAIC — Milestone 1.25
 
-**Measurement and Provider Hardening.**
+**Measurement, provider hardening and independent calibration infrastructure.**
 
-This independent folder adds local Ollama and hosted Groq provider adapters, five-dimensional
-usage accounting, and a grounded Alem prompt for real-model calibration. The implementation
-is **uncalibrated**: mocked provider checks and deterministic fixtures do not establish model
-competence, useful transfer or savings. M0–M2 remain independently runnable.
+Fake, optional loopback Ollama, Groq and Gemini Developer API adapters share the
+same public actor request. Exact models live in configurations. No model hierarchy,
+skill-transfer result or withdrawal result follows from this engineering scaffold.
+M0, M1 and M2 remain separately runnable and preserved.
 
-## Install and check without inference
-
-Use Python 3.12 for the pinned Alem extra. From this folder:
+## Offline verification
 
 ```sh
-uv sync --locked --extra alem --python 3.12
-uv run --locked --extra alem python -m mosaic.experiments.run --calibration-config ../milestone-1.5/configs/calibration-pilot.yaml --preflight
+uv sync --locked --python 3.12
+uv run --no-sync python -m ruff format --check mosaic tests
+uv run --no-sync python -m ruff check mosaic tests
+uv run --no-sync python -m mypy mosaic tests
+uv run --no-sync python -m pytest -q -m "not alem"
 ```
 
-Preflight checks configuration and runtime prerequisites without calling a model. It does not
-prove that either model can solve a task. It can inspect local Ollama model tags; for Groq it
-checks credential presence without contacting the remote endpoint or validating access.
-Groq credentials come only from `GROQ_API_KEY` in the
-process environment. Ollama uses `OLLAMA_HOST` or its loopback default; the adapter accepts only
-a loopback HTTP(S) origin. Do not put credentials in YAML, prompts or tracked files.
+Core tests use deterministic environments and mocked HTTP; they make zero network
+calls and require no credentials. Alem/JAX is an optional extra, outside ordinary
+PR installation and tests. Core CI also checks the read-only Laboratory separately.
 
-The calibration configuration names local `qwen3:4b` and Groq `openai/gpt-oss-120b`. These are
-configured model identifiers, not claims that either service is available or that their weak /
-teacher relationship is established. No model weights are bundled.
+## Calibration entry point
 
-## Run the pilot
+Follow the [API candidate registration and scientific gates](../milestone-1.5/README.md).
+The historical Ollama/Groq pilot configs remain preparation evidence. Real paired
+calibration now requires free-tier attestation, explicit physical allowances and
+a prior empirical selection decision/evidence digest. Do not run those old configs
+as an assumed Weak/Teacher comparison.
 
-```sh
-uv run --locked --extra alem python -m mosaic.experiments.run --calibration-config ../milestone-1.5/configs/calibration-pilot.yaml --output outputs/calibration-pilot
-```
+Credentials come only from `GEMINI_API_KEY` and `GROQ_API_KEY` in process memory.
+No billing or account-setting API is used. The operator must establish free-only
+account status before inference; model metadata alone does not establish it.
+Preflight checks local prerequisites with zero inference. Separately recorded
+metadata GETs establish listed access, while real smoke checks actual inference.
 
-The pilot evaluates weak-only and teacher-only arms independently. It has no escalation,
-skills, PlayBook, persistent actor memory or withdrawal intervention. Four task families
-(`collect_wood`, `collect_stone`, `make_wood_pickaxe`, `make_stone_pickaxe`) use seeds
-42, 19, 20, 7 and 11. Each arm receives the same public task, visible observations, legal
-solo actions and configured eight-turn visible history. Each episode permits at most 200
-decisions. The pilot schedules 40 episodes; this is a bounded calibration, not a lifetime
-token or monetary budget.
+Each logical generate makes at most one physical POST. No SDK retries, redirects,
+re-prompts or fallback models are used. Rejected JSON/actions consume a decision.
+Fatal provider failures stop the relevant batch, preserving partial traces and unknown
+usage. Proactive batch guards run before call reservation and provider dispatch.
+They record an incomplete infrastructure prefix rather than a failed task outcome.
+A nonfatal model-specific 404 excludes that model without retry while permitting
+independent registered models on the same provider to receive their first attempt.
 
-Both arms use temperature 0 and a 2,048-token output cap. Ollama explicitly uses thinking
-on and context window 32,768; Groq uses reasoning effort `medium`. Those controls have different
-provider semantics. This is an intentional declared difference, not an assertion of identical
-deliberation or tokenizer budgets. Compare raw usage and failures, and preserve the exact
-configuration with the traces.
+## Protocol and accounting
 
-Review the five-seed pilot before using the 20-seed expansion:
+Independent arms receive identical grounded goals, reset conditions, public rules,
+visible observations, advertised actions and eight-turn feedback history. Public
+prompt/action and private reset audit hashes check parity. Actors receive neither
+snapshots, verifier evidence, full achievements, PRNG state nor framework role labels.
+No skills, PlayBook, escalation, learning or teacher withdrawal are used.
 
-```sh
-uv run --locked --extra alem python -m mosaic.experiments.run --calibration-config ../milestone-1.5/configs/calibration-expanded.yaml --confirm-pilot-reviewed --output outputs/calibration-expanded
-```
+Gemini and Groq use native JSON mode without advertised-action schema constraints;
+the common local parser tests exact one-action shape and legality. This preserves
+the ability to measure illegal proposals. Provider reasoning settings remain
+declared differences rather than assumed equivalent budgets.
 
-The confirmation flag records the required review gate; it does not certify model competence.
-Output directories must be fresh. Calibration outcomes, invalid proposals, transport failures
-and unknown usage remain visible; there are no hidden retries to improve scores.
+Normalized usage preserves input, output, reasoning, cached input and provider-total
+tokens, request ID and measurement source. Missing fields remain `None`; known
+subtotals and unknown-call counts survive aggregation. Reasoning/cache dimensions
+are never added again to provider totals. Returned served-model IDs and sanitized
+numeric quota metadata support audit; no provider price is invented.
 
-The output contains `config.json`, `summary.json`, `report.md` and per-arm evidence under
-`<family>/<seed>/<weak|teacher>/`. Initial snapshot, advertised-action and visible-prompt hashes
-must match across a pair and its recorded reset evidence before it enters comparable outcome
-aggregates. Mismatches/errors remain recorded and their returned costs remain in raw totals.
-CLI exit 0 means the calibration protocol completed, including valid goal failures; exit 2
-marks setup/runtime or comparability errors.
+The Alem pin is `14d412e5ee961f9c43d6ce92ee05fee9cd1efc5e`. Official solo rule
+disclosure, precise visible coordinates and solo legal affordances are used.
+Soft specialization with both efficiencies 1.0 prevents a solo class gate from
+artificially blocking pickaxe goals. See [the official prompt comparison](docs/alem-prompt-comparison.md),
+[provider semantics](docs/providers.md) and [validation](docs/validation.md).
 
-## Measurement and protocol
-
-Each provider invocation makes one non-streaming standard-library HTTP POST. There is no SDK,
-automatic retry or redirect following. Provider failure consumes an attempted call with unknown
-usage when no valid response usage is available. Strict JSON action parsing uses the advertised
-list; rejected proposals consume a decision rather than triggering a repair call.
-
-Accounting retains input, output, reasoning, cached input and provider-reported total token
-dimensions separately. Missing dimensions remain `None`, with known subtotals and unknown-call
-counts in each role and in aggregate. Reasoning and cache counts are not added again to total
-usage; provider totals are preserved rather than synthesized. Request IDs and measurement
-sources support audit. Local elapsed provider time is not API cost or GPU time.
-
-The new Alem calibration adapter uses official solo rules and level-based disclosure, precise
-visible coordinates and legal affordances. Its solo action filter removes Request/Give from
-both actor-visible lists. Soft specialization with both efficiencies 1.0 avoids the legacy
-solo-warrior hard gate on pickaxe tasks. These conditions are the same for both roles and
-differ from the cooperative benchmark. See [the pinned prompt comparison](docs/alem-prompt-comparison.md).
-
-Read [provider and usage semantics](docs/providers.md), [the verification report](docs/validation.md)
-and [the calibration protocol folder](../milestone-1.5/README.md).
-
-## Offline core checks
-
-```sh
-uv sync --locked
-uv run --locked ruff format --check .
-uv run --locked ruff check .
-uv run --locked python -m mypy mosaic tests
-uv run --locked python -m pytest -q
-```
-
-Ordinary core tests use mocked transports and deterministic environments. They require no
-credentials, model calls or Alem installation. Real Alem adapter checks are optional and
-separate. Exact executed commands and results belong in the verification report.
-
-The revised order is M0 complete → M1 complete → M2 engineering scaffold complete → M1.25
-measurement/provider hardening → M1.5 real-model calibration → M1.75 protocol freeze → M2-R
-real-trajectory skill semantics → M3 hard withdrawal → M4 economics. M2's engineering scaffold
-remains scientifically unvalidated. The next recommended step is to **run real-model calibration**.
+M2 demonstrates plumbing, validation gates, persistence and accounting with
+deterministic fixtures. It does not demonstrate useful procedural transfer between
+real models. Its teacher-suffix/reset retrieval mismatch remains a blocker;
+calibration must precede M1.75, M2-R and any M3 study.

@@ -6,7 +6,11 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from test_calibration_protocol import real_calibration_data
+from test_calibration_protocol import (
+    IdentityPartialUsageProvider,
+    PublicRulesEnvironment,
+    real_calibration_data,
+)
 
 import mosaic.experiments.calibration as calibration_module
 from mosaic.core.config import (
@@ -22,12 +26,13 @@ from mosaic.core.events import (
     ModelResponded,
     read_events,
 )
-from mosaic.core.models import EnvironmentSnapshot
+from mosaic.core.models import EnvironmentSnapshot, ModelRequest, ModelResponse
 from mosaic.environments.fake import FakeEnvironment
 from mosaic.experiments.calibration import CalibrationReport, CalibrationRunner, preflight
 from mosaic.experiments.run import main
 from mosaic.experiments.runner import ExperimentRunner, RunArtifacts
 from mosaic.providers.factory import provider_factory
+from mosaic.providers.http import ProviderError
 
 PROJECT = Path(__file__).resolve().parents[1]
 
@@ -121,6 +126,16 @@ def test_paired_fixed_schedule_preserves_every_artifact_and_role_cost(
     assert aggregates["teacher"].accepted_runs == aggregates["teacher"].succeeded == 2
     assert aggregates["weak"].budget.model_calls == 40
     assert aggregates["teacher"].budget.model_calls == 22
+    assert aggregates["weak"].success_rate == 0 and aggregates["teacher"].success_rate == 1
+    assert aggregates["weak"].mean_steps == aggregates["weak"].median_steps == 20
+    assert aggregates["teacher"].mean_steps == aggregates["teacher"].median_steps == 11
+    assert aggregates["weak"].environment_actions == 40
+    assert aggregates["weak"].step_cap_rate == 1 and aggregates["teacher"].step_cap_rate == 0
+    assert aggregates["weak"].parse_failure_rate == aggregates["weak"].invalid_action_rate == 0
+    assert result.paired_outcomes == (
+        ("pump", 42, "Weak failed / Teacher succeeded"),
+        ("pump", 43, "Weak failed / Teacher succeeded"),
+    )
     report = (output / "report.md").read_text()
     assert "synthetic" in report and "unknown" in report
     assert "| Family | Weak success | Teacher success | Weak cost | Teacher cost |" in report
@@ -166,7 +181,7 @@ def test_initial_snapshot_mismatch_blocks_both_model_factories_and_keeps_pair(
     assert all(aggregate.accepted_runs == 0 for aggregate in result.aggregates)
 
 
-def test_one_provider_setup_error_preserves_later_registered_pair_and_earlier_costs(
+def test_uncertain_provider_setup_coverage_keeps_registered_rows_and_blocks_more_dispatch(
     fixture_config: CalibrationConfig, tmp_path: Path
 ) -> None:
     count = 0
@@ -181,20 +196,17 @@ def test_one_provider_setup_error_preserves_later_registered_pair_and_earlier_co
     result = asyncio.run(
         CalibrationRunner(model_factory=model).run(fixture_config, tmp_path / "partial")
     )
-    assert count == 4 and len(result.pairs) == 2
-    assert result.status == "error" and result.pairs[0].weak.status == "error"
-    assert result.pairs[0].teacher.summary is not None
-    assert result.pairs[0].teacher.budget.teacher.model_calls == 16
-    assert result.pairs[1].comparable
-    assert result.pairs[1].weak.budget.weak.model_calls == 20
-    assert result.pairs[1].teacher.budget.teacher.model_calls == 6
-    assert result.total_budget.weak.model_calls == 20
-    assert result.total_budget.teacher.model_calls == 22
-    assert result.total_budget.model_calls == 42
+    assert count == 1 and len(result.pairs) == 2
+    assert result.status == "incomplete" and result.pairs[0].weak.status == "error"
+    assert result.pairs[0].teacher.status == "skipped"
+    assert result.pairs[1].weak.status == result.pairs[1].teacher.status == "skipped"
+    assert result.total_budget.model_calls == 0 and not result.budget_complete
+    assert result.provider_budgets[0].stopped_reason == "budget_coverage_incomplete"
+    assert not result.provider_budgets[0].budget_complete
 
 
 @pytest.mark.parametrize("invalid_tail", [False, True])
-def test_incomplete_recording_retains_known_costs_and_excludes_only_affected_pair(
+def test_incomplete_recording_retains_known_costs_and_pauses_uncertain_provider(
     fixture_config: CalibrationConfig,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -232,9 +244,9 @@ def test_incomplete_recording_retains_known_costs_and_excludes_only_affected_pai
     monkeypatch.setattr(ExperimentRunner, "run", recording_failure)
     output = tmp_path / "interrupted"
     result = asyncio.run(CalibrationRunner().run(fixture_config, output))
-    assert attempted == [(42, "weak"), (42, "teacher"), (43, "weak"), (43, "teacher")]
-    assert result.status == "error" and not result.budget_complete
-    assert result.excluded_pairs == 1 and result.pairs[1].comparable
+    assert attempted == [(42, "weak")]
+    assert result.status == "incomplete" and not result.budget_complete
+    assert result.excluded_pairs == 2 and not result.pairs[1].comparable
     pair = result.pairs[0]
     assert not pair.comparable and pair.reason == "incomplete_arm_budget"
     assert pair.weak.status == "error" and pair.weak.summary is None
@@ -255,14 +267,15 @@ def test_incomplete_recording_retains_known_costs_and_excludes_only_affected_pai
         assert getattr(pair.weak.budget.weak, dimension) is None
         assert getattr(result.total_budget, dimension) is None
         assert getattr(result.total_budget.weak, dimension) is None
-    assert result.total_budget.model_calls == result.total_budget.environment_actions == 62
-    assert result.total_budget.teacher.model_calls == 22
+    assert result.total_budget.model_calls == result.total_budget.environment_actions == 20
+    assert result.total_budget.teacher.model_calls == 0
     assert result.total_budget.teacher.input_tokens is not None
-    assert result.total_budget.known_input_tokens > known_input
+    assert result.total_budget.known_input_tokens == known_input
     aggregates = {aggregate.role: aggregate for aggregate in result.aggregates}
-    assert aggregates["weak"].accepted_runs == aggregates["teacher"].accepted_runs == 1
-    assert aggregates["weak"].budget.model_calls == 20
-    assert aggregates["teacher"].budget.model_calls == 6
+    assert aggregates["weak"].accepted_runs == aggregates["teacher"].accepted_runs == 0
+    assert aggregates["weak"].budget.model_calls == aggregates["teacher"].budget.model_calls == 0
+    assert result.provider_budgets[0].stopped_reason == "budget_coverage_incomplete"
+    assert not result.provider_budgets[0].budget_complete
     assert "Call-ledger coverage complete: False" in (output / "report.md").read_text()
 
 
@@ -429,3 +442,91 @@ def test_default_real_pilot_and_review_gated_expansion_share_protocol_and_task_r
     assert pilot.prompt_protocol == expanded.prompt_protocol == "alem_official_v1"
     assert pilot.history_limit == expanded.history_limit == 8
     assert pilot.weak.max_output_tokens == pilot.teacher.max_output_tokens
+
+
+def test_provider_quota_failure_preserves_other_provider_costs_but_never_enters_paired_failure_rate(
+    tmp_path: Path,
+) -> None:
+    settings = CalibrationConfig.model_validate_json(json.dumps(real_calibration_data()))
+    constructed: list[str] = []
+
+    class QuotaProvider:
+        async def generate(self, request: ModelRequest) -> ModelResponse:
+            raise ProviderError("STATIC_OFFLINE_FAILURE", category="quota", http_status=429)
+
+    def models(model: ModelConfig) -> Any:
+        constructed.append(model.provider)
+        return QuotaProvider() if model.provider == "groq" else IdentityPartialUsageProvider(model)
+
+    report = asyncio.run(
+        CalibrationRunner(lambda config: PublicRulesEnvironment(config.agent.agent_id), models).run(
+            settings, tmp_path / "quota", confirm_free_tier=True
+        )
+    )
+    assert report.status == "incomplete" and report.excluded_pairs == 6
+    assert constructed.count("groq") == 1 and constructed.count("ollama") == 6
+    assert report.total_budget.model_calls == 61 and report.total_budget.environment_actions == 60
+    assert (
+        report.total_budget.teacher.model_calls == 1 and report.total_budget.weak.model_calls == 60
+    )
+    assert report.total_budget.known_input_tokens == 420
+    assert all(aggregate.accepted_runs == aggregate.failed == 0 for aggregate in report.aggregates)
+    assert all(aggregate.success_rate is None for aggregate in report.aggregates)
+    assert sum(aggregate.provider_failures for aggregate in report.aggregates) == 1
+    assert all(outcome[2].startswith("EXCLUDED") for outcome in report.paired_outcomes)
+    assert (
+        next(item for item in report.provider_budgets if item.provider == "groq").stopped_reason
+        == "quota"
+    )
+
+
+def test_live_calibration_requires_explicit_pair_decision_and_free_confirmation_before_dispatch(
+    tmp_path: Path,
+) -> None:
+    data = real_calibration_data()
+    data.pop("selection_decision")
+    data.pop("selection_evidence_sha256")
+    settings = CalibrationConfig.model_validate_json(json.dumps(data))
+    output = tmp_path / "unselected"
+    with pytest.raises(ValueError, match="selection decision"):
+        asyncio.run(CalibrationRunner().run(settings, output, confirm_free_tier=True))
+    assert not output.exists()
+    with pytest.raises(ValueError, match="free-tier-only"):
+        asyncio.run(CalibrationRunner().run(settings, output))
+    assert not output.exists()
+
+
+def test_missing_weak_model_does_not_pause_distinct_teacher_model_on_same_provider(
+    tmp_path: Path,
+) -> None:
+    data = real_calibration_data()
+    data["weak"] = {"provider": "gemini", "model": "missing-weak", "max_output_tokens": 64}
+    data["teacher"] = {"provider": "gemini", "model": "present-teacher", "max_output_tokens": 64}
+    data["request_limits"] = [
+        {"provider": "gemini", "max_requests": 1000, "quota_known": True, "max_episodes": 100}
+    ]
+    settings = CalibrationConfig.model_validate_json(json.dumps(data))
+    constructed: list[str] = []
+
+    class MissingProvider:
+        async def generate(self, request: ModelRequest) -> ModelResponse:
+            raise ProviderError("STATIC_MISSING_MODEL", category="not_found", http_status=404)
+
+    def models(model: ModelConfig) -> Any:
+        constructed.append(model.model)
+        return (
+            MissingProvider()
+            if model.model == "missing-weak"
+            else IdentityPartialUsageProvider(model)
+        )
+
+    report = asyncio.run(
+        CalibrationRunner(lambda config: PublicRulesEnvironment(config.agent.agent_id), models).run(
+            settings, tmp_path / "missing-weak", confirm_free_tier=True
+        )
+    )
+    assert constructed.count("missing-weak") == 1 and constructed.count("present-teacher") == 6
+    assert report.total_budget.model_calls == 61 and report.excluded_pairs == 6
+    assert report.provider_budgets[0].stopped_reason is None
+    assert report.provider_budgets[0].unavailable_models == ("missing-weak",)
+    assert all(pair.teacher.metrics.task_outcome == "failed" for pair in report.pairs)

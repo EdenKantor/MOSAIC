@@ -66,6 +66,9 @@ class ModelCallFailed(FrozenModel):
     latency_ms: float = Field(ge=0)
     error_type: str
     message: str
+    provider_category: str | None = None
+    http_status: int | None = None
+    stop_batch: bool = False
 
 
 class WeakAttemptStarted(FrozenModel):
@@ -176,6 +179,13 @@ class RunSummary(FrozenModel):
     teacher_call_fraction: float | None = Field(ge=0, le=1)
     escalations: int = Field(ge=0)
     blocked_escalations: int = Field(ge=0)
+    invalid_json: int = Field(default=0, ge=0)
+    invalid_action: int = Field(default=0, ge=0)
+    provider_failures: int = Field(default=0, ge=0)
+    provider_failure_category: str | None = None
+    provider_http_status: int | None = None
+    provider_stop_batch: bool = False
+    batch_stop_reason: str | None = None
 
 
 class ExperimentFinished(FrozenModel):

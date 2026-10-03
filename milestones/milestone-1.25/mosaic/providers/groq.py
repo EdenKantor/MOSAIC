@@ -8,6 +8,7 @@ from mosaic.providers.http import (
     HttpTransport,
     ProviderError,
     StdlibHttpTransport,
+    environment_secrets,
     optional_count,
     optional_identifier,
     redact,
@@ -23,8 +24,11 @@ class GroqModelProvider:
     ) -> None:
         key = os.environ.get("GROQ_API_KEY", "")
         if not key.strip() or "\r" in key or "\n" in key:
-            raise ProviderError("GROQ_API_KEY is required in the environment")
+            raise ProviderError(
+                "GROQ_API_KEY is required in the environment", category="authentication"
+            )
         self.__api_key = key
+        self.__captured_secrets = environment_secrets()
         self.__timeout_seconds = timeout_seconds
         self.__transport = transport or StdlibHttpTransport()
 
@@ -77,7 +81,7 @@ class GroqModelProvider:
             raw_identifier = body["id"]
         if metadata is not None and metadata.get("id") is not None:
             raw_identifier = metadata["id"]
-        identifier = optional_identifier(raw_identifier, self.__api_key)
+        identifier = optional_identifier(raw_identifier, *self.__captured_secrets)
         usage = usage_record(
             input_tokens=optional_count(reported, "prompt_tokens"),
             output_tokens=optional_count(reported, "completion_tokens"),
@@ -89,8 +93,10 @@ class GroqModelProvider:
         )
         return ModelResponse(
             provider="groq",
-            model=redact(model, self.__api_key),
-            text=redact(message["content"], self.__api_key),
+            model=redact(model, *self.__captured_secrets),
+            text=redact(message["content"], *self.__captured_secrets),
             usage=usage,
-            finish_reason=redact(finish, self.__api_key),
+            finish_reason=redact(finish, *self.__captured_secrets),
+            reported_model=optional_identifier(body.get("model"), *self.__captured_secrets),
+            rate_limits=response.rate_limits,
         )

@@ -1,12 +1,14 @@
 # Provider and measurement semantics
 
-The Ollama and Groq adapters are implemented but uncalibrated. Their tests use mocked network
-transports. Configured identifiers `qwen3:4b` and `openai/gpt-oss-120b` do not establish model
-availability, a useful competence gap, useful transfer or economic savings.
+The Ollama, Groq and Gemini Developer API adapters are implemented. Their tests use mocked
+network transports. Model identifiers do not establish a useful competence gap, transfer or
+economic savings. The current API-only candidate protocol and free-only execution boundaries
+are defined in [the calibration contract](free-only-calibration.md); the earlier Ollama/Groq
+configs are preserved preparation, not an empirically selected pair.
 
 ## Requests and secrets
 
-Both adapters serialize the same actor-visible request: system instruction, public goal,
+All adapters serialize the same actor-visible request: system instruction, public goal,
 step, current observation, advertised action names/descriptions and bounded visible feedback.
 Private environment snapshots and verifier evidence do not enter the request. Calibration
 uses the official solo Alem rules and the same configured eight-turn history for both roles.
@@ -21,9 +23,14 @@ request field. Ollama uses `OLLAMA_HOST`, defaulting to `http://127.0.0.1:11434`
 only a loopback HTTP(S) origin without credentials, query, fragment or endpoint path. It sends
 no Groq credential to Ollama. Neither adapter bundles or downloads model weights.
 
+Gemini uses a fixed HTTPS `generateContent` endpoint and obtains `GEMINI_API_KEY` only from
+the process environment, in the `x-goog-api-key` header rather than a URL. It receives the
+same system/user content and requests native JSON MIME type without an action schema enum.
+No search, paid tools, explicit cache creation, Vertex API or billing API is used.
+
 Provider errors have static messages that omit response bodies and credential-bearing
-exceptions. Normalized response strings and identifiers redact the captured/current Groq
-credential. This is a defined artifact boundary, not permission to place secrets in prompts
+exceptions. Normalized strings and identifiers redact both captured/current provider
+credentials. This is a defined artifact boundary, not permission to place secrets in prompts
 or a guarantee against arbitrary external code reading the process environment.
 
 ## One attempted call, one POST
@@ -33,7 +40,8 @@ There is no SDK retry layer, automatic reattempt, fallback model or redirect fol
 redirects, rate limits and other non-success status codes are explicit failures. Error bodies
 are not normalized into actor output or exception messages.
 
-The episode runner reserves a role-labelled call before dispatch and records elapsed latency.
+Proactive free-only batch guards run before call reservation. An allowed episode call then
+reserves its role-labelled call before dispatch and records elapsed latency.
 A failed request remains one attempted call. Its unavailable usage stays unknown; it does not
 become a zero-token success. A returned provider response still must satisfy metadata/usage
 validation and the ordinary exact JSON action parser. Parsing failure consumes the decision
@@ -92,7 +100,7 @@ inference cost was zero.
 
 ## Declared model controls
 
-The calibration configuration in
+The historical calibration configuration in
 [milestone-1.5/configs/calibration-pilot.yaml](../../milestone-1.5/configs/calibration-pilot.yaml)
 uses temperature 0 and a 2,048-token output cap for both roles. Ollama sends `think=true` and
 `options.num_ctx=32768`; Groq sends `reasoning_effort="medium"`. These are deliberately
@@ -104,6 +112,7 @@ through its parser. A provider may still fail to emit usable JSON or consume its
 before an action. Preserve those failures during calibration rather than changing prompts,
 output caps or retry rules after inspecting a score.
 
-Independent weak-only and teacher-only calibration contains no skills, PlayBook, learning or
-withdrawal intervention. The next recommended step is to run real-model calibration, review
-the five-seed pilot, and use its evidence before protocol freeze or M2-R/M3 claims.
+Independent candidate and paired calibration contains no skills, PlayBook, learning or
+withdrawal intervention. Empirical candidate selection must precede registration of a
+pair-specific five-seed pilot. M1.75 and M2-R require useful real calibration evidence; M3
+remains stopped. See the current contract for Gemini usage fields and cumulative quota guards.
