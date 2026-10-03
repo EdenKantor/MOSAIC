@@ -1,109 +1,102 @@
 # MOSAIC — Milestone 1.5
 
-**Real-Model Calibration Protocol — Uncalibrated.**
+**Real-model capability calibration. No empirical Weak/Teacher pair has been selected.**
 
-This folder contains the pilot and expansion configurations for independent weak-only and
-teacher-only calibration. The runtime lives in the separately runnable
-[Milestone 1.25 folder](../milestone-1.25/README.md). The configurations are ready for
-calibration; no completed real-model study or useful competence gap is claimed.
+The API-only candidate protocol uses the [M1.25 runtime](../milestone-1.25/README.md).
+It contains no skills, PlayBook, learning, escalation or withdrawal. The earlier
+Ollama/Groq pilot and expansion files are retained as historical preparation;
+their role labels are hypotheses, and those files must not bypass candidate selection.
 
-Calibration contains no skills, PlayBook, learning, teacher escalation or withdrawal
-intervention. Its purpose is to establish useful weak and teacher behavior under the same
-grounded task interface before protocol freeze and real-trajectory skill redesign.
+The current registrations are [expanded provider smoke](configs/free-model-smoke-expanded-20261003.yaml)
+and [expanded candidate diagnostics](configs/free-model-selection-expanded-20261003.yaml).
+They retain nine stable Gemini text IDs, add legacy Gemini 3 Flash and two hosted
+Gemma 4 text models, and register Groq GPT-OSS 20B, GPT-OSS 120B and Qwen 3.8 27B.
+Allam remains an explicit free-access skip. Gemini 2.5 Flash-Lite's initial inference
+returned HTTP 404 despite its metadata listing; it is not retried. Model sizes and
+names do not assign roles. The original registrations remain unchanged evidence.
+The [expanded access inventory](reports/2026-10-03/expanded-access-preflight.json) records exact IDs,
+metadata status, public limits, unknown remaining quota and exclusions.
 
-## Protocol
+The [partial real results](reports/2026-10-03/calibration-report.md) record seven usable
+one-action smokes and two successful resource-acquisition diagnostics, one each for
+GPT-OSS 20B and 120B on seed 42. Both providers subsequently stopped: Gemini HTTP 503,
+Groq HTTP 429. The original Groq error category was `billing`; a legacy classifier could
+mistake a generic billing link for paid-access evidence. Its raw body was discarded,
+so the exact cause cannot be established retrospectively. The classifier is fixed for
+future requests, while historical evidence and the provider stop remain intact.
+There is no selected pair, five-seed pilot, protocol freeze or M2-R implementation.
 
-| Condition | Declared setting |
+## Registered diagnostic conditions
+
+| Condition | Setting |
 | --- | --- |
-| Task families | `collect_wood`, `collect_stone`, `make_wood_pickaxe`, `make_stone_pickaxe` |
-| Pilot seeds | 42, 19, 20, 7, 11; five per family and role |
-| Arms | Weak-only and teacher-only, each reset independently |
-| Weak identifier | Ollama `qwen3:4b` |
-| Teacher identifier | Groq `openai/gpt-oss-120b` |
-| Common sampling | Temperature 0; output cap 2,048 tokens |
-| Decision cap | 200 per episode |
-| Weak deliberation | Thinking on; context window 32,768 |
-| Teacher deliberation | Reasoning effort `medium` |
-| Actor context | Official solo Alem rules, legal actions, visible observations and eight-turn history |
-| Expansion | 20 seeds per family and role, only after pilot review |
+| Environment | Alem `14d412e5ee961f9c43d6ce92ee05fee9cd1efc5e` |
+| Goals | collect_wood; collect_stone; make_wood_pickaxe; make_stone_pickaxe |
+| Diagnostic seed | 42, independently reset for every candidate/task |
+| Episode decision cap | 200; smoke has one decision |
+| Sampling | temperature 0; maximum output 2,048 tokens; timeout 120 seconds |
+| Actor input | official solo rules, public task, observations, advertised legal actions, eight visible feedback turns |
+| Output | native JSON object mode, then common exact one-action/legal-action validation |
+| GPT-OSS controls | reasoning_effort medium for both sizes |
+| Other controls | provider defaults; exact returned usage and served-model metadata retained |
+| Free-only physical cap | 75 calls per provider across cumulative diagnostic scopes; smoke cap 12 |
+| Pacing | at least 61 seconds between starts for the same provider |
+| Quota uncertainty | one episode per provider per invocation; stop on provider failure; preserve partials |
 
-These provider controls are intentional recorded differences. Local thinking and hosted
-reasoning effort are not identical mechanisms or a matched deliberation/tokenizer budget.
-Model identifiers are configuration values rather than proof of availability or competence.
-No model weights or credentials are included.
+Provider defaults, tokenizers and reasoning controls are not identical deliberation
+budgets. Do not infer usage from response length or add reasoning/cache counts again
+to provider totals. API alias and returned served-model identifiers are both recorded.
 
-The Alem environment is pinned to `14d412e5ee961f9c43d6ce92ee05fee9cd1efc5e`. One-player
-calibration has no coordination or god mode. Soft specialization with both efficiencies 1.0
-unblocks the focused resource/tool tasks for the solo warrior. Both arms receive the same
-public information. The official prompt uses precise coordinates, legal affordances and
-current-level rule disclosure. Private snapshots and goal-verifier evidence remain audit data.
-See [the pinned prompt comparison](../milestone-1.25/docs/alem-prompt-comparison.md).
+The original full diagnostic scope was 12 × 4 × 200 = **9,600 requests**. Following
+the 404 access exclusion and three additional text candidates, the expanded
+registered bound is 14 × 4 × 200 = **11,200 requests**. This is
+not authorized as one unattended batch. Scoped plans record episodes × max_steps
+and the separate physical allowance before dispatch. Groq's conservative planning
+envelope is 200,000 reported tokens and an 8,000-token ceiling per next request;
+these are planning guards, not proof of the account's unused quota. Missing usage,
+insufficient allowance or a quota failure stops dispatch. A budget-limited prefix
+has an unknown capability outcome and never becomes a failed task score. After
+three valid Groq smoke responses, the expanded physical allowance increased from
+25 to 75 while retaining the token envelope, pacing, prompt and task conditions.
+The 8,000-token next-request reserve is a planning assumption, not a measured
+tokenizer bound; observed overrun blocks further dispatch.
 
-## Run from the runtime folder
+## Execute a scoped smoke
 
-Use Python 3.12 for the optional Alem dependency. Run these commands from `milestone-1.25`:
+From `milestones/milestone-1.25`, with credentials supplied only by the process environment:
 
 ```sh
 uv sync --locked --extra alem --python 3.12
-uv run --locked --extra alem python -m mosaic.experiments.run --calibration-config ../milestone-1.5/configs/calibration-pilot.yaml --preflight
-uv run --locked --extra alem python -m mosaic.experiments.run --calibration-config ../milestone-1.5/configs/calibration-pilot.yaml --output outputs/calibration-pilot
+uv run --no-sync python -m mosaic.experiments.run --selection-config ../milestone-1.5/configs/free-model-smoke-expanded-20261003.yaml --preflight
+uv run --no-sync python -m mosaic.experiments.run --selection-config ../milestone-1.5/configs/free-model-smoke-expanded-20261003.yaml --confirm-free-tier --candidate openai-gpt-oss-20b --output runs/smoke-20b
 ```
 
-Preflight verifies prerequisites without inference. Groq requires `GROQ_API_KEY` in the process
-environment. Ollama uses its default loopback host or `OLLAMA_HOST`; credentials never belong
-in YAML or tracked files. Output directories must be fresh. A preflight pass does not mean a
-model can solve the tasks. Local model tags may be inspected; the Groq check validates
-credential presence without contacting the remote endpoint or proving access.
+`--confirm-free-tier` records the operator's already-verified account constraint; it
+does not inspect or change billing. For every later scope, supply **all** preceding
+session summaries once each using repeated `--prior-summary`. Fatal stopped providers
+remain stopped. A nonfatal model-specific 404 persists that model as unavailable
+without retry; independent registered models may continue. There is no automatic
+retry, re-prompt, fallback or quota recovery.
+Smoke pass means a usable provider interaction, not goal success after one action.
 
-Review task success, invalid actions, failure cases, step-cap saturation and raw usage by role
-and family before expanding. Preserve negative outcomes and record any calibration-driven
-family selection explicitly before protocol freeze. Then run:
+## Scientific gates
 
-```sh
-uv run --locked --extra alem python -m mosaic.experiments.run --calibration-config ../milestone-1.5/configs/calibration-expanded.yaml --confirm-pilot-reviewed --output outputs/calibration-expanded
-```
+1. Check access, interface failures and public-prompt parity before capability judgments.
+2. Diagnose every available candidate independently on seed 42 across the four goals.
+3. Record one explicit pair-selection decision with evidence and rejected candidates.
+   Require weak headroom, a materially stronger teacher, and neither shared floor nor ceiling.
+   Success ranges 20–50% and 60–90% are planning illustrations, never thresholds.
+4. Only then register a new pair-specific pilot: seeds 42, 19, 20, 7 and 11.
+   Family selection and any protocol changes must be documented before that pilot.
+5. Evaluate paired results, failures, cost dimensions and uncertainty; expand to about
+   20 seeds only after reviewing a stable useful gap.
 
-The review flag is required for expansion; it does not certify scientific readiness. There
-are no automatic provider/parse retries, fallback models, reflection calls or hidden teacher
-repairs. Every attempted call and dispatched action remains accounted for. Missing usage
-dimensions stay unknown; reasoning/cache counts are not added again to provider totals.
-See [usage semantics](../milestone-1.25/docs/providers.md) and
-[the verification/calibration status](../milestone-1.25/docs/validation.md).
+Report per task/model success, steps, calls, accepted/rejected actions, parsing failures,
+step-cap saturation, failures/timeouts, usage dimensions and wall time. Exclude
+infrastructure-incomplete episodes from capability denominators while retaining costs.
+Task labels are CEILING, USEFUL_GAP, SHARED_FLOOR or AMBIGUOUS. One seed cannot establish
+population success rates. No useful measured gap means stop skill work and recalibrate
+the model pair or task difficulty.
 
-Each run preserves the configuration, summary and readable report plus per-family/seed/role
-episode evidence. Snapshot, advertised-action and visible-prompt hashes must match for both
-arms and their recorded reset evidence. Incomparable pairs are retained with explicit errors
-and excluded from outcome aggregates; their returned costs stay visible. A completed run can
-contain legitimate goal failures. It is not a certification that all tasks succeeded.
-
-## Gate for later work
-
-The pilot is looking for a useful empirical region, not a predetermined hierarchy. Weak
-success around 20-50% and teacher success around 60-90% are planning examples, not scientific
-thresholds. The weak model must have substantial room to improve while remaining capable;
-the teacher must be materially better; neither should be at ceiling. A pair scoring 3%/6%
-would be rejected for a shared floor, and a pair scoring 94%/97% for a shared ceiling.
-Treat the family labels as hypotheses about difficulty until real trajectories support them.
-
-No real executions have filled this required evidence table:
-
-| Task family | Weak success | Teacher success | Weak cost/usage | Teacher cost/usage |
-| --- | --- | --- | --- | --- |
-| Resource acquisition | Pending | Pending | Unknown | Unknown |
-| Navigation + acquisition | Pending | Pending | Unknown | Unknown |
-| Simple crafting | Pending | Pending | Unknown | Unknown |
-| Multi-step crafting | Pending | Pending | Unknown | Unknown |
-
-Do not resume skill-learning work until real executions establish a useful gap. Then freeze
-the experimental protocol and decide the M2-R procedural representation from real trajectories.
-Full-task workflows are the preferred starting design for Experiment #1; teacher-suffix/subgoal
-skills require dynamic activation and a defensible activation-state validation design. Neither
-redesign is implemented here.
-
-M0 and M1 are complete, and M2's engineering scaffold is complete but scientifically
-unvalidated. The revised sequence is M1.25 measurement/provider hardening → M1.5 real-model
-calibration → M1.75 protocol freeze → M2-R real-trajectory skill semantics → M3 hard teacher
-withdrawal → M4 economics. The teacher-suffix/reset activation mismatch must be resolved in
-M2-R; the existing withdrawal primitive is not a completed M3 study.
-
-The next recommended step is to **run real-model calibration** and review the five-seed pilot.
+M1.75 and M2-R remain gated by real calibration evidence. M3 remains stopped. The
+[Laboratory](../laboratory/README.md) reads saved evidence without controlling execution.

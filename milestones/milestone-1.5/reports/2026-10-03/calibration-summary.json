@@ -1,0 +1,2861 @@
+{
+  "schema_version": 1,
+  "date_utc": "2026-10-03",
+  "status": "PARTIAL_REAL_EXECUTIONS_PROVIDER_BLOCKED",
+  "alem_commit": "14d412e5ee961f9c43d6ce92ee05fee9cd1efc5e",
+  "credential_availability": {
+    "gemini": "AVAILABLE",
+    "groq": "AVAILABLE"
+  },
+  "billing_attestation": {
+    "source": "user_manual_verification",
+    "gemini": "No billing account",
+    "groq": "Free - $0 - Current Plan"
+  },
+  "metadata_get_requests": 5,
+  "physical_inference_attempts": 16,
+  "returned_responses": 11,
+  "accepted_environment_actions": 11,
+  "successful_smoke_models": 7,
+  "completed_capability_episodes": 2,
+  "provider_failures": 5,
+  "timeouts": 0,
+  "hidden_retries": 0,
+  "paid_fallback_calls": 0,
+  "account_settings_mutations": 0,
+  "provider_cost_usd": null,
+  "provider_cost_note": "No paid tier or paid fallback; providers did not return per-request monetary charges. Token totals for failed attempts remain unknown.",
+  "provider_totals": {
+    "gemini": {
+      "physical_inference_attempts": 8,
+      "returned_responses": 4,
+      "accepted_environment_actions": 4,
+      "usage": {
+        "input_tokens": {
+          "known_subtotal": 7948,
+          "unknown_attempts": 4,
+          "complete_total": null
+        },
+        "output_tokens": {
+          "known_subtotal": 30,
+          "unknown_attempts": 4,
+          "complete_total": null
+        },
+        "reasoning_tokens": {
+          "known_subtotal": 525,
+          "unknown_attempts": 6,
+          "complete_total": null
+        },
+        "cached_input_tokens": {
+          "known_subtotal": 0,
+          "unknown_attempts": 8,
+          "complete_total": null
+        },
+        "provider_total_tokens": {
+          "known_subtotal": 8503,
+          "unknown_attempts": 4,
+          "complete_total": null
+        }
+      }
+    },
+    "groq": {
+      "physical_inference_attempts": 8,
+      "returned_responses": 7,
+      "accepted_environment_actions": 7,
+      "usage": {
+        "input_tokens": {
+          "known_subtotal": 14844,
+          "unknown_attempts": 1,
+          "complete_total": null
+        },
+        "output_tokens": {
+          "known_subtotal": 857,
+          "unknown_attempts": 1,
+          "complete_total": null
+        },
+        "reasoning_tokens": {
+          "known_subtotal": 756,
+          "unknown_attempts": 2,
+          "complete_total": null
+        },
+        "cached_input_tokens": {
+          "known_subtotal": 0,
+          "unknown_attempts": 8,
+          "complete_total": null
+        },
+        "provider_total_tokens": {
+          "known_subtotal": 15701,
+          "unknown_attempts": 1,
+          "complete_total": null
+        }
+      }
+    }
+  },
+  "candidates": [
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash-lite",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "MODEL_NOT_FOUND_HTTP_404",
+      "remaining_quota": null,
+      "input_context_limit": 1048576,
+      "max_output_limit": 65536,
+      "published_free_limits": {
+        "rpm": null,
+        "rpd": null,
+        "tpm": null,
+        "tpd": null
+      },
+      "quota_scope": "project/model",
+      "status_note": "Metadata listing did not establish generation access; no reattempt permitted.",
+      "final_inference_access": "HTTP_404",
+      "physical_inference_attempts": 1,
+      "smoke_batch": "smoke-gemini-2-5-flash-lite",
+      "diagnostic_batches": [],
+      "served_model_ids": [],
+      "empirical_role": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.5-flash-lite",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "NOT_TESTED",
+      "remaining_quota": null,
+      "input_context_limit": 1048576,
+      "max_output_limit": 65536,
+      "published_free_limits": {
+        "rpm": null,
+        "rpd": null,
+        "tpm": null,
+        "tpd": null
+      },
+      "quota_scope": "project/model",
+      "final_inference_access": "SMOKE_PASSED",
+      "physical_inference_attempts": 1,
+      "smoke_batch": "smoke-expanded-gemini-3-5-flash-lite",
+      "diagnostic_batches": [],
+      "served_model_ids": [
+        "gemini-3.5-flash-lite"
+      ],
+      "empirical_role": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.1-flash-lite",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "NOT_TESTED",
+      "remaining_quota": null,
+      "input_context_limit": 1048576,
+      "max_output_limit": 65536,
+      "published_free_limits": {
+        "rpm": null,
+        "rpd": null,
+        "tpm": null,
+        "tpd": null
+      },
+      "quota_scope": "project/model",
+      "final_inference_access": "SMOKE_PASSED",
+      "physical_inference_attempts": 1,
+      "smoke_batch": "smoke-expanded-gemini-3-1-flash-lite",
+      "diagnostic_batches": [],
+      "served_model_ids": [
+        "gemini-3.1-flash-lite"
+      ],
+      "empirical_role": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "NOT_TESTED",
+      "remaining_quota": null,
+      "input_context_limit": 1048576,
+      "max_output_limit": 65536,
+      "published_free_limits": {
+        "rpm": null,
+        "rpd": null,
+        "tpm": null,
+        "tpd": null
+      },
+      "quota_scope": "project/model",
+      "final_inference_access": "HTTP_404",
+      "physical_inference_attempts": 1,
+      "smoke_batch": "smoke-expanded-gemini-2-5-flash",
+      "diagnostic_batches": [],
+      "served_model_ids": [],
+      "empirical_role": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-pro",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "NOT_TESTED",
+      "remaining_quota": null,
+      "input_context_limit": 1048576,
+      "max_output_limit": 65536,
+      "published_free_limits": {
+        "rpm": null,
+        "rpd": null,
+        "tpm": null,
+        "tpd": null
+      },
+      "quota_scope": "project/model",
+      "final_inference_access": "HTTP_404",
+      "physical_inference_attempts": 1,
+      "smoke_batch": "smoke-expanded-gemini-2-5-pro",
+      "diagnostic_batches": [],
+      "served_model_ids": [],
+      "empirical_role": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.5-flash",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "NOT_TESTED",
+      "remaining_quota": null,
+      "input_context_limit": 1048576,
+      "max_output_limit": 65536,
+      "published_free_limits": {
+        "rpm": null,
+        "rpd": null,
+        "tpm": null,
+        "tpd": null
+      },
+      "quota_scope": "project/model",
+      "final_inference_access": "SMOKE_PASSED",
+      "physical_inference_attempts": 1,
+      "smoke_batch": "smoke-expanded-gemini-3-5-flash",
+      "diagnostic_batches": [],
+      "served_model_ids": [
+        "gemini-3.5-flash"
+      ],
+      "empirical_role": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.6-flash",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "NOT_TESTED",
+      "remaining_quota": null,
+      "input_context_limit": 1048576,
+      "max_output_limit": 65536,
+      "published_free_limits": {
+        "rpm": null,
+        "rpd": null,
+        "tpm": null,
+        "tpd": null
+      },
+      "quota_scope": "project/model",
+      "final_inference_access": "SMOKE_PASSED",
+      "physical_inference_attempts": 1,
+      "smoke_batch": "smoke-expanded-gemini-3-6-flash",
+      "diagnostic_batches": [],
+      "served_model_ids": [
+        "gemini-3.6-flash"
+      ],
+      "empirical_role": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.7-flash",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "NOT_TESTED",
+      "remaining_quota": null,
+      "input_context_limit": 1048576,
+      "max_output_limit": 65536,
+      "published_free_limits": {
+        "rpm": null,
+        "rpd": null,
+        "tpm": null,
+        "tpd": null
+      },
+      "quota_scope": "project/model",
+      "final_inference_access": "HTTP_503",
+      "physical_inference_attempts": 1,
+      "smoke_batch": "smoke-expanded-gemini-3-7-flash",
+      "diagnostic_batches": [],
+      "served_model_ids": [],
+      "empirical_role": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "NOT_TESTED",
+      "remaining_quota": null,
+      "input_context_limit": 1048576,
+      "max_output_limit": 65536,
+      "published_free_limits": {
+        "rpm": null,
+        "rpd": null,
+        "tpm": null,
+        "tpd": null
+      },
+      "quota_scope": "project/model",
+      "final_inference_access": "NOT_DISPATCHED_PROVIDER_STOPPED",
+      "physical_inference_attempts": 0,
+      "smoke_batch": "smoke-gemini-3-8-flash",
+      "diagnostic_batches": [],
+      "served_model_ids": [],
+      "empirical_role": null
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "SMOKE_PASSED",
+      "remaining_quota": null,
+      "input_context_limit": 131072,
+      "max_output_limit": 65536,
+      "published_free_limits": {
+        "rpm": 30,
+        "rpd": 1000,
+        "tpm": 8000,
+        "tpd": 200000
+      },
+      "quota_scope": "organization/model",
+      "final_inference_access": "SMOKE_PASSED",
+      "physical_inference_attempts": 3,
+      "smoke_batch": "smoke-openai-gpt-oss-20b",
+      "diagnostic_batches": [
+        "diagnostic-openai-gpt-oss-20b-multi-step-crafting",
+        "diagnostic-openai-gpt-oss-20b-navigation-and-acquisition",
+        "diagnostic-openai-gpt-oss-20b-resource-acquisition",
+        "diagnostic-openai-gpt-oss-20b-simple-crafting"
+      ],
+      "served_model_ids": [
+        "openai/gpt-oss-20b"
+      ],
+      "empirical_role": null
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "SMOKE_PASSED",
+      "remaining_quota": null,
+      "input_context_limit": 131072,
+      "max_output_limit": 65536,
+      "published_free_limits": {
+        "rpm": 30,
+        "rpd": 1000,
+        "tpm": 8000,
+        "tpd": 200000
+      },
+      "quota_scope": "organization/model",
+      "final_inference_access": "SMOKE_PASSED",
+      "physical_inference_attempts": 3,
+      "smoke_batch": "smoke-openai-gpt-oss-120b",
+      "diagnostic_batches": [
+        "diagnostic-openai-gpt-oss-120b-multi-step-crafting",
+        "diagnostic-openai-gpt-oss-120b-navigation-and-acquisition",
+        "diagnostic-openai-gpt-oss-120b-resource-acquisition",
+        "diagnostic-openai-gpt-oss-120b-simple-crafting"
+      ],
+      "served_model_ids": [
+        "openai/gpt-oss-120b"
+      ],
+      "empirical_role": null
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "SMOKE_PASSED",
+      "remaining_quota": null,
+      "input_context_limit": 131072,
+      "max_output_limit": 16384,
+      "published_free_limits": {
+        "rpm": 30,
+        "rpd": 1000,
+        "tpm": 8000,
+        "tpd": 200000
+      },
+      "quota_scope": "organization/model",
+      "final_inference_access": "SMOKE_PASSED",
+      "physical_inference_attempts": 2,
+      "smoke_batch": "smoke-qwen-qwen3-8-27b",
+      "diagnostic_batches": [
+        "diagnostic-qwen-qwen3-8-27b-multi-step-crafting",
+        "diagnostic-qwen-qwen3-8-27b-navigation-and-acquisition",
+        "diagnostic-qwen-qwen3-8-27b-resource-acquisition",
+        "diagnostic-qwen-qwen3-8-27b-simple-crafting"
+      ],
+      "served_model_ids": [
+        "qwen/qwen3.8-27b"
+      ],
+      "empirical_role": null
+    },
+    {
+      "provider": "groq",
+      "model": "allam-2-7b",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "input_context_limit": 4096,
+      "standard_text_free_pricing": null,
+      "inference_access": "SKIPPED_ACCESS_UNVERIFIED",
+      "remaining_quota": null,
+      "published_free_limits": null,
+      "reason": "Current published free-limit table omits this active model; 4K context also requires an interface feasibility check. Its bilingual specialization alone is not evidence of incapability.",
+      "final_inference_access": "SKIPPED_ACCESS_UNVERIFIED",
+      "physical_inference_attempts": 0,
+      "smoke_batch": "smoke-allam-2-7b",
+      "diagnostic_batches": [],
+      "served_model_ids": [],
+      "empirical_role": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3-flash-preview",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "NOT_TESTED",
+      "remaining_quota": null,
+      "input_context_limit": 1048576,
+      "max_output_limit": 65536,
+      "published_free_limits": {
+        "rpm": null,
+        "rpd": null,
+        "tpm": null,
+        "tpd": null
+      },
+      "quota_scope": "project/model",
+      "final_inference_access": "NOT_DISPATCHED_PROVIDER_STOPPED",
+      "physical_inference_attempts": 0,
+      "smoke_batch": "smoke-expanded-gemini-3-flash-preview",
+      "diagnostic_batches": [],
+      "served_model_ids": [],
+      "empirical_role": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemma-4-26b-a4b-it",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "NOT_TESTED",
+      "remaining_quota": null,
+      "input_context_limit": 262144,
+      "max_output_limit": 32768,
+      "published_free_limits": {
+        "rpm": null,
+        "rpd": null,
+        "tpm": null,
+        "tpd": null
+      },
+      "quota_scope": "project/model",
+      "final_inference_access": "NOT_DISPATCHED_PROVIDER_STOPPED",
+      "physical_inference_attempts": 0,
+      "smoke_batch": "smoke-expanded-gemma-4-26b-a4b-it",
+      "diagnostic_batches": [],
+      "served_model_ids": [],
+      "empirical_role": null
+    },
+    {
+      "provider": "gemini",
+      "model": "gemma-4-31b-it",
+      "metadata_http_status": 200,
+      "metadata_available": true,
+      "standard_text_free_pricing": true,
+      "inference_access": "NOT_TESTED",
+      "remaining_quota": null,
+      "input_context_limit": 262144,
+      "max_output_limit": 32768,
+      "published_free_limits": {
+        "rpm": null,
+        "rpd": null,
+        "tpm": null,
+        "tpd": null
+      },
+      "quota_scope": "project/model",
+      "final_inference_access": "NOT_DISPATCHED_PROVIDER_STOPPED",
+      "physical_inference_attempts": 0,
+      "smoke_batch": "smoke-expanded-gemma-4-31b-it",
+      "diagnostic_batches": [],
+      "served_model_ids": [],
+      "empirical_role": null
+    }
+  ],
+  "excluded_safety_classifiers": [
+    "meta-llama/llama-prompt-guard-2-22m",
+    "meta-llama/llama-prompt-guard-2-86m",
+    "openai/gpt-oss-safeguard-20b"
+  ],
+  "sources": {
+    "gemini_pricing": "https://ai.google.dev/gemini-api/docs/pricing",
+    "gemini_limits": "https://ai.google.dev/gemini-api/docs/rate-limits",
+    "groq_limits": "https://console.groq.com/docs/rate-limits",
+    "groq_models": "https://console.groq.com/docs/models",
+    "allam": "https://console.groq.com/docs/model/allam-2-7b",
+    "gemma_api": "https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api"
+  },
+  "provider_stops": {
+    "gemini": {
+      "http_status": 503,
+      "category": "server_error",
+      "model": "gemini-3.7-flash",
+      "retry_attempts": 0
+    },
+    "groq": {
+      "http_status": 429,
+      "historical_category": "billing",
+      "model": "qwen/qwen3.8-27b",
+      "retry_attempts": 0,
+      "cause_certainty": "Unknown: legacy generic billing-link classification could override quota classification; raw error body discarded. Historical trace preserved; future classifier corrected."
+    }
+  },
+  "accounting_note": "All registered models are candidates. Runtime weak annotations are accounting slots, not an empirical Weak selection. Reasoning/cache fields must not be added again to provider totals.",
+  "evidence_note": "Normalized raw JSON/JSONL remains under ignored local runs/. This public projection records per-call usage, served IDs, outcomes and integrity hashes without privileged simulator snapshots or raw error bodies.",
+  "decision": {
+    "date_utc": "2026-10-03",
+    "status": "INCOMPLETE_PROVIDER_BLOCKED",
+    "selected_weak": null,
+    "selected_teacher": null,
+    "observed_pair": {
+      "provider": "groq",
+      "models": [
+        "openai/gpt-oss-20b",
+        "openai/gpt-oss-120b"
+      ],
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "successes_per_model": 1,
+      "completed_episodes_per_model": 1,
+      "initial_snapshot_action_prompt_hashes_match": true,
+      "observed_success_gap_percentage_points": 0,
+      "interpretation": "No separation on this single diagnostic seed; population gap unknown."
+    },
+    "families": [
+      {
+        "family": "resource-acquisition",
+        "label": "CEILING",
+        "scope": "single-seed signal only",
+        "reason": "Both completed GPT-OSS candidates succeeded on seed 42; Qwen and Gemini capability incomplete."
+      },
+      {
+        "family": "navigation-and-acquisition",
+        "label": "AMBIGUOUS",
+        "reason": "No complete real-model diagnostic episode."
+      },
+      {
+        "family": "simple-crafting",
+        "label": "AMBIGUOUS",
+        "reason": "No complete real-model diagnostic episode."
+      },
+      {
+        "family": "multi-step-crafting",
+        "label": "AMBIGUOUS",
+        "reason": "No complete real-model diagnostic episode."
+      }
+    ],
+    "five_seed_pilot": "NOT_RUN",
+    "milestone_1_75": "NOT_FROZEN",
+    "milestone_2_R": "NOT_IMPLEMENTED",
+    "milestone_3": "STOPPED",
+    "paid_access": "NONE",
+    "billing_changes": 0,
+    "rejected_as_empirical_pair": [],
+    "selection_rationale": "Insufficient completed families/seeds and no demonstrated useful capability gap. Infrastructure failures are not evidence of model incapability.",
+    "next_step": "Resume real-model calibration when verified free quota and provider availability permit."
+  },
+  "records": [
+    {
+      "batch": "diagnostic-openai-gpt-oss-120b-multi-step-crafting",
+      "stage": "selection",
+      "candidate": "openai-gpt-oss-120b",
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "declared_role": "candidate",
+      "family": "multi-step-crafting",
+      "task": "make_stone_pickaxe",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "2969a70a481d34e9a8678964b3734bf82d88ff884e9233c5ba6a9513968a2dec"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "28951db9890a6a73530327f22b1f08c727253b0a7250ad8446e9bb81060db8e3",
+      "summary_path": "runs/real-model-20261003/diagnostic-openai-gpt-oss-120b-multi-step-crafting/summary.json",
+      "summary_sha256": "dbc7e1432110d2a3a27a565e6998bd828b2055f03ab86cca0b00bcd9a5f86421",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "diagnostic-openai-gpt-oss-120b-navigation-and-acquisition",
+      "stage": "selection",
+      "candidate": "openai-gpt-oss-120b",
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "declared_role": "candidate",
+      "family": "navigation-and-acquisition",
+      "task": "collect_stone",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "35e1686177f56f9d0591365153b788b64ea5ac8fbb98408205824bfa2ba6233f"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "28951db9890a6a73530327f22b1f08c727253b0a7250ad8446e9bb81060db8e3",
+      "summary_path": "runs/real-model-20261003/diagnostic-openai-gpt-oss-120b-navigation-and-acquisition/summary.json",
+      "summary_sha256": "cb1bc741ae5d6c3453d191d78cb69608a27b640818d3919c0dc3403eac9fcbd1",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "diagnostic-openai-gpt-oss-120b-resource-acquisition",
+      "stage": "selection",
+      "candidate": "openai-gpt-oss-120b",
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "succeeded",
+      "reason": "environment_verified",
+      "smoke_passed": true,
+      "decision_steps": 2,
+      "environment_actions": 2,
+      "model_calls": 2,
+      "usage": {
+        "input_tokens": 4403,
+        "output_tokens": 333,
+        "reasoning_tokens": 304,
+        "cached_input_tokens": null,
+        "provider_total_tokens": 4736
+      },
+      "episode_wall_ms": 114563.27549996786,
+      "inference_wall_ms": 1545.0456000398844,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "succeeded",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "3ea5b0a391418806bc01f6a5c28651b7810af94749f7afa9ac7df847e7a0dee6"
+      },
+      "initial_trace_matches": true,
+      "config_sha256": "28951db9890a6a73530327f22b1f08c727253b0a7250ad8446e9bb81060db8e3",
+      "summary_path": "runs/real-model-20261003/diagnostic-openai-gpt-oss-120b-resource-acquisition/summary.json",
+      "summary_sha256": "7bab79103985f33a12d9cab3694d6efe3d7caca9c2fd7942bd8a486de8f926f6",
+      "trace_path": "runs/real-model-20261003/diagnostic-openai-gpt-oss-120b-resource-acquisition/openai-gpt-oss-120b/resource-acquisition/42/events.jsonl",
+      "trace_sha256": "2e22dbaa0a82affeec990a6e6c2b0243a86f7e9e2634dc98b9c38b9aac490466",
+      "calls": [
+        {
+          "call_index": 0,
+          "status": "response_received",
+          "requested_model": "openai/gpt-oss-120b",
+          "reported_model": "openai/gpt-oss-120b",
+          "usage": {
+            "input_tokens": 2027,
+            "output_tokens": 247,
+            "reasoning_tokens": 232,
+            "cached_input_tokens": null,
+            "provider_total_tokens": 2274,
+            "provider_request_id": "req_01m40j7w0eemv85pvn0vygeqj0",
+            "measurement": "provider",
+            "measurement_source": "groq.chat.completions.usage"
+          },
+          "rate_limits": {
+            "request_limit": 1000,
+            "token_limit": 8000,
+            "remaining_requests": 999,
+            "remaining_tokens": 5721,
+            "request_reset_seconds": 86.4,
+            "token_reset_seconds": 17.092
+          },
+          "latency_ms": 964.9706999771297,
+          "http_status": null
+        },
+        {
+          "call_index": 1,
+          "status": "response_received",
+          "requested_model": "openai/gpt-oss-120b",
+          "reported_model": "openai/gpt-oss-120b",
+          "usage": {
+            "input_tokens": 2376,
+            "output_tokens": 86,
+            "reasoning_tokens": 72,
+            "cached_input_tokens": null,
+            "provider_total_tokens": 2462,
+            "provider_request_id": "req_01m40j9qjeed2vkm266t6jwapx",
+            "measurement": "provider",
+            "measurement_source": "groq.chat.completions.usage"
+          },
+          "rate_limits": {
+            "request_limit": 1000,
+            "token_limit": 8000,
+            "remaining_requests": 998,
+            "remaining_tokens": 5416,
+            "request_reset_seconds": 172.8,
+            "token_reset_seconds": 19.38
+          },
+          "latency_ms": 580.0749000627548,
+          "http_status": null
+        }
+      ],
+      "trajectory_notes": [
+        "Accepted environment actions: 2.",
+        "First accepted action: Move West; last accepted action: Do.",
+        "Declared task outcome: succeeded; termination: environment_verified."
+      ]
+    },
+    {
+      "batch": "diagnostic-openai-gpt-oss-120b-simple-crafting",
+      "stage": "selection",
+      "candidate": "openai-gpt-oss-120b",
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "declared_role": "candidate",
+      "family": "simple-crafting",
+      "task": "make_wood_pickaxe",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "b769b26960018be2149cbb150e7e2c614569ba5babab6ea74766e744aed343e8"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "28951db9890a6a73530327f22b1f08c727253b0a7250ad8446e9bb81060db8e3",
+      "summary_path": "runs/real-model-20261003/diagnostic-openai-gpt-oss-120b-simple-crafting/summary.json",
+      "summary_sha256": "3acf27207813e5d88c2a13d32fdf8b08214b528d14afafd5c435092025a23f1d",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "diagnostic-openai-gpt-oss-20b-multi-step-crafting",
+      "stage": "selection",
+      "candidate": "openai-gpt-oss-20b",
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "declared_role": "candidate",
+      "family": "multi-step-crafting",
+      "task": "make_stone_pickaxe",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "2969a70a481d34e9a8678964b3734bf82d88ff884e9233c5ba6a9513968a2dec"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "28951db9890a6a73530327f22b1f08c727253b0a7250ad8446e9bb81060db8e3",
+      "summary_path": "runs/real-model-20261003/diagnostic-openai-gpt-oss-20b-multi-step-crafting/summary.json",
+      "summary_sha256": "bd7accc2f8fbbabcea33b490fe2d3a6a14a9b2c9f1a5d6ae50abfa819f9d5b11",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "diagnostic-openai-gpt-oss-20b-navigation-and-acquisition",
+      "stage": "selection",
+      "candidate": "openai-gpt-oss-20b",
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "declared_role": "candidate",
+      "family": "navigation-and-acquisition",
+      "task": "collect_stone",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "35e1686177f56f9d0591365153b788b64ea5ac8fbb98408205824bfa2ba6233f"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "28951db9890a6a73530327f22b1f08c727253b0a7250ad8446e9bb81060db8e3",
+      "summary_path": "runs/real-model-20261003/diagnostic-openai-gpt-oss-20b-navigation-and-acquisition/summary.json",
+      "summary_sha256": "b0b6a61dfffa57b6c417ff81a085789b5949d1e635973f17f0d7b0f41102f2f0",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "diagnostic-openai-gpt-oss-20b-resource-acquisition",
+      "stage": "selection",
+      "candidate": "openai-gpt-oss-20b",
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "succeeded",
+      "reason": "environment_verified",
+      "smoke_passed": true,
+      "decision_steps": 2,
+      "environment_actions": 2,
+      "model_calls": 2,
+      "usage": {
+        "input_tokens": 4403,
+        "output_tokens": 170,
+        "reasoning_tokens": 138,
+        "cached_input_tokens": null,
+        "provider_total_tokens": 4573
+      },
+      "episode_wall_ms": 62280.583899933845,
+      "inference_wall_ms": 1158.7985998485237,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "succeeded",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "3ea5b0a391418806bc01f6a5c28651b7810af94749f7afa9ac7df847e7a0dee6"
+      },
+      "initial_trace_matches": true,
+      "config_sha256": "28951db9890a6a73530327f22b1f08c727253b0a7250ad8446e9bb81060db8e3",
+      "summary_path": "runs/real-model-20261003/diagnostic-openai-gpt-oss-20b-resource-acquisition/summary.json",
+      "summary_sha256": "0abf5aba3c6f9b99f92c6e45841173d84220cfb156750331c651e4c08d3a0755",
+      "trace_path": "runs/real-model-20261003/diagnostic-openai-gpt-oss-20b-resource-acquisition/openai-gpt-oss-20b/resource-acquisition/42/events.jsonl",
+      "trace_sha256": "2f92cb452f071c3d65fcb6226956ab4d3fd72716f1711b6b7c4f17abeaecde67",
+      "calls": [
+        {
+          "call_index": 0,
+          "status": "response_received",
+          "requested_model": "openai/gpt-oss-20b",
+          "reported_model": "openai/gpt-oss-20b",
+          "usage": {
+            "input_tokens": 2027,
+            "output_tokens": 86,
+            "reasoning_tokens": 68,
+            "cached_input_tokens": null,
+            "provider_total_tokens": 2113,
+            "provider_request_id": "req_01m40j44yne3ssjke2jgnhqb5v",
+            "measurement": "provider",
+            "measurement_source": "groq.chat.completions.usage"
+          },
+          "rate_limits": {
+            "request_limit": 1000,
+            "token_limit": 8000,
+            "remaining_requests": 999,
+            "remaining_tokens": 5717,
+            "request_reset_seconds": 86.4,
+            "token_reset_seconds": 17.122
+          },
+          "latency_ms": 491.7714998591691,
+          "http_status": null
+        },
+        {
+          "call_index": 1,
+          "status": "response_received",
+          "requested_model": "openai/gpt-oss-20b",
+          "reported_model": "openai/gpt-oss-20b",
+          "usage": {
+            "input_tokens": 2376,
+            "output_tokens": 84,
+            "reasoning_tokens": 70,
+            "cached_input_tokens": null,
+            "provider_total_tokens": 2460,
+            "provider_request_id": "req_01m40j60gyed188rqeyqmb3b52",
+            "measurement": "provider",
+            "measurement_source": "groq.chat.completions.usage"
+          },
+          "rate_limits": {
+            "request_limit": 1000,
+            "token_limit": 8000,
+            "remaining_requests": 998,
+            "remaining_tokens": 5362,
+            "request_reset_seconds": 172.8,
+            "token_reset_seconds": 19.785
+          },
+          "latency_ms": 667.0270999893546,
+          "http_status": null
+        }
+      ],
+      "trajectory_notes": [
+        "Accepted environment actions: 2.",
+        "First accepted action: Move West; last accepted action: Do.",
+        "Declared task outcome: succeeded; termination: environment_verified."
+      ]
+    },
+    {
+      "batch": "diagnostic-openai-gpt-oss-20b-simple-crafting",
+      "stage": "selection",
+      "candidate": "openai-gpt-oss-20b",
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "declared_role": "candidate",
+      "family": "simple-crafting",
+      "task": "make_wood_pickaxe",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "b769b26960018be2149cbb150e7e2c614569ba5babab6ea74766e744aed343e8"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "28951db9890a6a73530327f22b1f08c727253b0a7250ad8446e9bb81060db8e3",
+      "summary_path": "runs/real-model-20261003/diagnostic-openai-gpt-oss-20b-simple-crafting/summary.json",
+      "summary_sha256": "f0cac5fff8ac1932066c79b8e382329c6a614601a24b63e2808c860fabc638f0",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "diagnostic-qwen-qwen3-8-27b-multi-step-crafting",
+      "stage": "selection",
+      "candidate": "qwen-qwen3-8-27b",
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "declared_role": "candidate",
+      "family": "multi-step-crafting",
+      "task": "make_stone_pickaxe",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "2969a70a481d34e9a8678964b3734bf82d88ff884e9233c5ba6a9513968a2dec"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "28951db9890a6a73530327f22b1f08c727253b0a7250ad8446e9bb81060db8e3",
+      "summary_path": "runs/real-model-20261003/diagnostic-qwen-qwen3-8-27b-multi-step-crafting/summary.json",
+      "summary_sha256": "a8449e1acf74b26cc7e810257efc4cf989e48660660f704017316d2630875374",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "diagnostic-qwen-qwen3-8-27b-navigation-and-acquisition",
+      "stage": "selection",
+      "candidate": "qwen-qwen3-8-27b",
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "declared_role": "candidate",
+      "family": "navigation-and-acquisition",
+      "task": "collect_stone",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "35e1686177f56f9d0591365153b788b64ea5ac8fbb98408205824bfa2ba6233f"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "28951db9890a6a73530327f22b1f08c727253b0a7250ad8446e9bb81060db8e3",
+      "summary_path": "runs/real-model-20261003/diagnostic-qwen-qwen3-8-27b-navigation-and-acquisition/summary.json",
+      "summary_sha256": "c07dfb35c75991e58675645e091da2fcd35ed5d90ee9e9fb236c83ab60cc9930",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "diagnostic-qwen-qwen3-8-27b-resource-acquisition",
+      "stage": "selection",
+      "candidate": "qwen-qwen3-8-27b",
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "error",
+      "reason": "provider_failure: billing",
+      "smoke_passed": false,
+      "decision_steps": 1,
+      "environment_actions": 0,
+      "model_calls": 1,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 57283.54010009207,
+      "inference_wall_ms": 144.31739994324744,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 1,
+        "provider_failure_category": "billing",
+        "provider_http_status": 429,
+        "provider_stop_batch": true,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "3ea5b0a391418806bc01f6a5c28651b7810af94749f7afa9ac7df847e7a0dee6"
+      },
+      "initial_trace_matches": true,
+      "config_sha256": "28951db9890a6a73530327f22b1f08c727253b0a7250ad8446e9bb81060db8e3",
+      "summary_path": "runs/real-model-20261003/diagnostic-qwen-qwen3-8-27b-resource-acquisition/summary.json",
+      "summary_sha256": "ce9ecf8807376a1a455a7da9550d41ef36000324965892bf5d639add8a2b6113",
+      "trace_path": "runs/real-model-20261003/diagnostic-qwen-qwen3-8-27b-resource-acquisition/qwen-qwen3-8-27b/resource-acquisition/42/events.jsonl",
+      "trace_sha256": "c3b13542865e0c6ad53c184426d417339d163e802674419a05c9c14e143c721e",
+      "calls": [
+        {
+          "call_index": 0,
+          "status": "provider_failure",
+          "requested_model": "qwen/qwen3.8-27b",
+          "reported_model": null,
+          "usage": {
+            "input_tokens": null,
+            "output_tokens": null,
+            "reasoning_tokens": null,
+            "cached_input_tokens": null,
+            "provider_total_tokens": null,
+            "provider_request_id": null,
+            "measurement": "unavailable",
+            "measurement_source": null
+          },
+          "rate_limits": null,
+          "latency_ms": 144.31739994324744,
+          "http_status": 429,
+          "historical_provider_category": "billing",
+          "stop_batch": true
+        }
+      ],
+      "trajectory_notes": [
+        "Accepted environment actions: 0.",
+        "Declared task outcome: unknown; termination: provider_failure: billing."
+      ]
+    },
+    {
+      "batch": "diagnostic-qwen-qwen3-8-27b-simple-crafting",
+      "stage": "selection",
+      "candidate": "qwen-qwen3-8-27b",
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "declared_role": "candidate",
+      "family": "simple-crafting",
+      "task": "make_wood_pickaxe",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "b769b26960018be2149cbb150e7e2c614569ba5babab6ea74766e744aed343e8"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "28951db9890a6a73530327f22b1f08c727253b0a7250ad8446e9bb81060db8e3",
+      "summary_path": "runs/real-model-20261003/diagnostic-qwen-qwen3-8-27b-simple-crafting/summary.json",
+      "summary_sha256": "bb7176b828d9300665da73fca5f56c883bccd4329e14e50ef335cd033403a54d",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "smoke-allam-2-7b",
+      "stage": "smoke",
+      "candidate": "allam-2-7b",
+      "provider": "groq",
+      "model": "allam-2-7b",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "access_unverified",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "454ae2dfd095a88fbcc8afe970b2a9d6d0497897b64bce2283e7c266d9a3e0c5",
+      "summary_path": "runs/real-model-20261003/smoke-allam-2-7b/summary.json",
+      "summary_sha256": "92f9087d2862d8a3edd25026088d1aec557651cee254588325e5a43d1af91630",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "smoke-expanded-gemini-2-5-flash",
+      "stage": "smoke",
+      "candidate": "gemini-2-5-flash",
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "error",
+      "reason": "provider_failure: not_found",
+      "smoke_passed": false,
+      "decision_steps": 1,
+      "environment_actions": 0,
+      "model_calls": 1,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 36251.757099991664,
+      "inference_wall_ms": 346.9910998828709,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 1,
+        "provider_failure_category": "not_found",
+        "provider_http_status": 404,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": true,
+      "config_sha256": "dbd68f0edf08c707aa24966d501973d2ca698372f8ddb9900fc3bb7dd882e749",
+      "summary_path": "runs/real-model-20261003/smoke-expanded-gemini-2-5-flash/summary.json",
+      "summary_sha256": "7e7ade76255cfbad2189f96777ec79bf903943c6f659be61389d77d216733580",
+      "trace_path": "runs/real-model-20261003/smoke-expanded-gemini-2-5-flash/gemini-2-5-flash/resource-acquisition/42/events.jsonl",
+      "trace_sha256": "09c4d66c6c55f3c05b57c3f18559050cf3862f909580ebc9e5ff1c2bf2a68f55",
+      "calls": [
+        {
+          "call_index": 0,
+          "status": "provider_failure",
+          "requested_model": "gemini-2.5-flash",
+          "reported_model": null,
+          "usage": {
+            "input_tokens": null,
+            "output_tokens": null,
+            "reasoning_tokens": null,
+            "cached_input_tokens": null,
+            "provider_total_tokens": null,
+            "provider_request_id": null,
+            "measurement": "unavailable",
+            "measurement_source": null
+          },
+          "rate_limits": null,
+          "latency_ms": 346.9910998828709,
+          "http_status": 404,
+          "historical_provider_category": "not_found",
+          "stop_batch": false
+        }
+      ],
+      "trajectory_notes": [
+        "Accepted environment actions: 0.",
+        "Declared task outcome: unknown; termination: provider_failure: not_found."
+      ]
+    },
+    {
+      "batch": "smoke-expanded-gemini-2-5-pro",
+      "stage": "smoke",
+      "candidate": "gemini-2-5-pro",
+      "provider": "gemini",
+      "model": "gemini-2.5-pro",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "error",
+      "reason": "provider_failure: not_found",
+      "smoke_passed": false,
+      "decision_steps": 1,
+      "environment_actions": 0,
+      "model_calls": 1,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 57458.570499904454,
+      "inference_wall_ms": 326.8429001327604,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 1,
+        "provider_failure_category": "not_found",
+        "provider_http_status": 404,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": true,
+      "config_sha256": "dbd68f0edf08c707aa24966d501973d2ca698372f8ddb9900fc3bb7dd882e749",
+      "summary_path": "runs/real-model-20261003/smoke-expanded-gemini-2-5-pro/summary.json",
+      "summary_sha256": "c26cb2686763247ffb8a4b0dc0943e660cc79f6aaa8abab8f32db142f7769b37",
+      "trace_path": "runs/real-model-20261003/smoke-expanded-gemini-2-5-pro/gemini-2-5-pro/resource-acquisition/42/events.jsonl",
+      "trace_sha256": "eb7ff4a56239b779b84041cf46e6e51c2dba40004f7c61fa7df1ea58d5eabd37",
+      "calls": [
+        {
+          "call_index": 0,
+          "status": "provider_failure",
+          "requested_model": "gemini-2.5-pro",
+          "reported_model": null,
+          "usage": {
+            "input_tokens": null,
+            "output_tokens": null,
+            "reasoning_tokens": null,
+            "cached_input_tokens": null,
+            "provider_total_tokens": null,
+            "provider_request_id": null,
+            "measurement": "unavailable",
+            "measurement_source": null
+          },
+          "rate_limits": null,
+          "latency_ms": 326.8429001327604,
+          "http_status": 404,
+          "historical_provider_category": "not_found",
+          "stop_batch": false
+        }
+      ],
+      "trajectory_notes": [
+        "Accepted environment actions: 0.",
+        "Declared task outcome: unknown; termination: provider_failure: not_found."
+      ]
+    },
+    {
+      "batch": "smoke-expanded-gemini-3-1-flash-lite",
+      "stage": "smoke",
+      "candidate": "gemini-3-1-flash-lite",
+      "provider": "gemini",
+      "model": "gemini-3.1-flash-lite",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "failed",
+      "reason": "environment_truncated",
+      "smoke_passed": true,
+      "decision_steps": 1,
+      "environment_actions": 1,
+      "model_calls": 1,
+      "usage": {
+        "input_tokens": 1987,
+        "output_tokens": 7,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": 1994
+      },
+      "episode_wall_ms": 69424.38119999133,
+      "inference_wall_ms": 12615.193099947646,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": true,
+        "task_outcome": "failed",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": true,
+      "config_sha256": "dbd68f0edf08c707aa24966d501973d2ca698372f8ddb9900fc3bb7dd882e749",
+      "summary_path": "runs/real-model-20261003/smoke-expanded-gemini-3-1-flash-lite/summary.json",
+      "summary_sha256": "ceded2892e144c09316c569102ff0df7367e5f4956428a8b5bb717848563a318",
+      "trace_path": "runs/real-model-20261003/smoke-expanded-gemini-3-1-flash-lite/gemini-3-1-flash-lite/resource-acquisition/42/events.jsonl",
+      "trace_sha256": "06a3f5abe06b6980e36dfefebd9ad5937be043f898619e1d286d424e6b1adfe3",
+      "calls": [
+        {
+          "call_index": 0,
+          "status": "response_received",
+          "requested_model": "gemini-3.1-flash-lite",
+          "reported_model": "gemini-3.1-flash-lite",
+          "usage": {
+            "input_tokens": 1987,
+            "output_tokens": 7,
+            "reasoning_tokens": null,
+            "cached_input_tokens": null,
+            "provider_total_tokens": 1994,
+            "provider_request_id": "_szAasL9A8mJvdIP3aHA6AY",
+            "measurement": "provider",
+            "measurement_source": "gemini.generateContent.usageMetadata"
+          },
+          "rate_limits": null,
+          "latency_ms": 12615.193099947646,
+          "http_status": null
+        }
+      ],
+      "trajectory_notes": [
+        "Accepted environment actions: 1.",
+        "First accepted action: Move West; last accepted action: Move West.",
+        "Declared task outcome: failed; termination: environment_truncated."
+      ]
+    },
+    {
+      "batch": "smoke-expanded-gemini-3-5-flash",
+      "stage": "smoke",
+      "candidate": "gemini-3-5-flash",
+      "provider": "gemini",
+      "model": "gemini-3.5-flash",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "failed",
+      "reason": "environment_truncated",
+      "smoke_passed": true,
+      "decision_steps": 1,
+      "environment_actions": 1,
+      "model_calls": 1,
+      "usage": {
+        "input_tokens": 1987,
+        "output_tokens": 12,
+        "reasoning_tokens": 216,
+        "cached_input_tokens": null,
+        "provider_total_tokens": 2215
+      },
+      "episode_wall_ms": 85042.01680002734,
+      "inference_wall_ms": 9746.844799956307,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": true,
+        "task_outcome": "failed",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": true,
+      "config_sha256": "dbd68f0edf08c707aa24966d501973d2ca698372f8ddb9900fc3bb7dd882e749",
+      "summary_path": "runs/real-model-20261003/smoke-expanded-gemini-3-5-flash/summary.json",
+      "summary_sha256": "8370f0c8dfd0f26411ef8152906cf050d1f785697dec1c676df263cefb76fde2",
+      "trace_path": "runs/real-model-20261003/smoke-expanded-gemini-3-5-flash/gemini-3-5-flash/resource-acquisition/42/events.jsonl",
+      "trace_sha256": "9e3c52028e52709bc13b96b2d377cfd478a9f36262f1e0e7b37a608773b27c73",
+      "calls": [
+        {
+          "call_index": 0,
+          "status": "response_received",
+          "requested_model": "gemini-3.5-flash",
+          "reported_model": "gemini-3.5-flash",
+          "usage": {
+            "input_tokens": 1987,
+            "output_tokens": 12,
+            "reasoning_tokens": 216,
+            "cached_input_tokens": null,
+            "provider_total_tokens": 2215,
+            "provider_request_id": "tM3AaraxOt_ikdUPo4WL0Ac",
+            "measurement": "provider",
+            "measurement_source": "gemini.generateContent.usageMetadata"
+          },
+          "rate_limits": null,
+          "latency_ms": 9746.844799956307,
+          "http_status": null
+        }
+      ],
+      "trajectory_notes": [
+        "Accepted environment actions: 1.",
+        "First accepted action: Move West; last accepted action: Move West.",
+        "Declared task outcome: failed; termination: environment_truncated."
+      ]
+    },
+    {
+      "batch": "smoke-expanded-gemini-3-5-flash-lite",
+      "stage": "smoke",
+      "candidate": "gemini-3-5-flash-lite",
+      "provider": "gemini",
+      "model": "gemini-3.5-flash-lite",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "failed",
+      "reason": "environment_truncated",
+      "smoke_passed": true,
+      "decision_steps": 1,
+      "environment_actions": 1,
+      "model_calls": 1,
+      "usage": {
+        "input_tokens": 1987,
+        "output_tokens": 6,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": 1993
+      },
+      "episode_wall_ms": 10634.2252001632,
+      "inference_wall_ms": 946.0388999432325,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": true,
+        "task_outcome": "failed",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": true,
+      "config_sha256": "dbd68f0edf08c707aa24966d501973d2ca698372f8ddb9900fc3bb7dd882e749",
+      "summary_path": "runs/real-model-20261003/smoke-expanded-gemini-3-5-flash-lite/summary.json",
+      "summary_sha256": "d2b22a2c3c647c764aaa41fb5f6348275547e1570094fbeab27429b92a037204",
+      "trace_path": "runs/real-model-20261003/smoke-expanded-gemini-3-5-flash-lite/gemini-3-5-flash-lite/resource-acquisition/42/events.jsonl",
+      "trace_sha256": "32d337494e5286ac7c9e150ed2da52efe279c9b50bfe5562c169bb50dcb03751",
+      "calls": [
+        {
+          "call_index": 0,
+          "status": "response_received",
+          "requested_model": "gemini-3.5-flash-lite",
+          "reported_model": "gemini-3.5-flash-lite",
+          "usage": {
+            "input_tokens": 1987,
+            "output_tokens": 6,
+            "reasoning_tokens": null,
+            "cached_input_tokens": null,
+            "provider_total_tokens": 1993,
+            "provider_request_id": "wMzAasi1OpLGsgKkkJ-ZDQ",
+            "measurement": "provider",
+            "measurement_source": "gemini.generateContent.usageMetadata"
+          },
+          "rate_limits": null,
+          "latency_ms": 946.0388999432325,
+          "http_status": null
+        }
+      ],
+      "trajectory_notes": [
+        "Accepted environment actions: 1.",
+        "First accepted action: Move West; last accepted action: Move West.",
+        "Declared task outcome: failed; termination: environment_truncated."
+      ]
+    },
+    {
+      "batch": "smoke-expanded-gemini-3-6-flash",
+      "stage": "smoke",
+      "candidate": "gemini-3-6-flash",
+      "provider": "gemini",
+      "model": "gemini-3.6-flash",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "failed",
+      "reason": "environment_truncated",
+      "smoke_passed": true,
+      "decision_steps": 1,
+      "environment_actions": 1,
+      "model_calls": 1,
+      "usage": {
+        "input_tokens": 1987,
+        "output_tokens": 5,
+        "reasoning_tokens": 309,
+        "cached_input_tokens": null,
+        "provider_total_tokens": 2301
+      },
+      "episode_wall_ms": 42349.6314000804,
+      "inference_wall_ms": 2756.78430008702,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": true,
+        "task_outcome": "failed",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": true,
+      "config_sha256": "dbd68f0edf08c707aa24966d501973d2ca698372f8ddb9900fc3bb7dd882e749",
+      "summary_path": "runs/real-model-20261003/smoke-expanded-gemini-3-6-flash/summary.json",
+      "summary_sha256": "1371f6a3b29b00e0cc468ea4a6fc42b3eff669c382fd866f86d2bf04012288bf",
+      "trace_path": "runs/real-model-20261003/smoke-expanded-gemini-3-6-flash/gemini-3-6-flash/resource-acquisition/42/events.jsonl",
+      "trace_sha256": "9a098e13581dd85533e5f6ebc476ee835667f8af909fd64539056eeeec092089",
+      "calls": [
+        {
+          "call_index": 0,
+          "status": "response_received",
+          "requested_model": "gemini-3.6-flash",
+          "reported_model": "gemini-3.6-flash",
+          "usage": {
+            "input_tokens": 1987,
+            "output_tokens": 5,
+            "reasoning_tokens": 309,
+            "cached_input_tokens": null,
+            "provider_total_tokens": 2301,
+            "provider_request_id": "8c3AauzVO4CW28oPt_KnmA0",
+            "measurement": "provider",
+            "measurement_source": "gemini.generateContent.usageMetadata"
+          },
+          "rate_limits": null,
+          "latency_ms": 2756.78430008702,
+          "http_status": null
+        }
+      ],
+      "trajectory_notes": [
+        "Accepted environment actions: 1.",
+        "First accepted action: Move West; last accepted action: Move West.",
+        "Declared task outcome: failed; termination: environment_truncated."
+      ]
+    },
+    {
+      "batch": "smoke-expanded-gemini-3-7-flash",
+      "stage": "smoke",
+      "candidate": "gemini-3-7-flash",
+      "provider": "gemini",
+      "model": "gemini-3.7-flash",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "error",
+      "reason": "provider_failure: server_error",
+      "smoke_passed": false,
+      "decision_steps": 1,
+      "environment_actions": 0,
+      "model_calls": 1,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 46526.45120001398,
+      "inference_wall_ms": 6930.487900041044,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 1,
+        "provider_failure_category": "server_error",
+        "provider_http_status": 503,
+        "provider_stop_batch": true,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": true,
+      "config_sha256": "dbd68f0edf08c707aa24966d501973d2ca698372f8ddb9900fc3bb7dd882e749",
+      "summary_path": "runs/real-model-20261003/smoke-expanded-gemini-3-7-flash/summary.json",
+      "summary_sha256": "365718b112c22ec1b6e18c388f3585f2a42227154f6bc128dfe825ca009fe402",
+      "trace_path": "runs/real-model-20261003/smoke-expanded-gemini-3-7-flash/gemini-3-7-flash/resource-acquisition/42/events.jsonl",
+      "trace_sha256": "6dac8a2f642190696a9810fb1be208c7da3fc4aab50263dc48023ace5a771200",
+      "calls": [
+        {
+          "call_index": 0,
+          "status": "provider_failure",
+          "requested_model": "gemini-3.7-flash",
+          "reported_model": null,
+          "usage": {
+            "input_tokens": null,
+            "output_tokens": null,
+            "reasoning_tokens": null,
+            "cached_input_tokens": null,
+            "provider_total_tokens": null,
+            "provider_request_id": null,
+            "measurement": "unavailable",
+            "measurement_source": null
+          },
+          "rate_limits": null,
+          "latency_ms": 6930.487900041044,
+          "http_status": 503,
+          "historical_provider_category": "server_error",
+          "stop_batch": true
+        }
+      ],
+      "trajectory_notes": [
+        "Accepted environment actions: 0.",
+        "Declared task outcome: unknown; termination: provider_failure: server_error."
+      ]
+    },
+    {
+      "batch": "smoke-expanded-gemini-3-8-flash",
+      "stage": "smoke",
+      "candidate": "gemini-3-8-flash",
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "dbd68f0edf08c707aa24966d501973d2ca698372f8ddb9900fc3bb7dd882e749",
+      "summary_path": "runs/real-model-20261003/smoke-expanded-gemini-3-8-flash/summary.json",
+      "summary_sha256": "b04e235f18b99f5f238d2c6d9793c53a974736951b4e4d87c06a47bc5fa543e2",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "smoke-expanded-gemini-3-flash-preview",
+      "stage": "smoke",
+      "candidate": "gemini-3-flash-preview",
+      "provider": "gemini",
+      "model": "gemini-3-flash-preview",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "dbd68f0edf08c707aa24966d501973d2ca698372f8ddb9900fc3bb7dd882e749",
+      "summary_path": "runs/real-model-20261003/smoke-expanded-gemini-3-flash-preview/summary.json",
+      "summary_sha256": "927d57d7f3a863b0ac4676a2a62306f6612604af71df070912eec125b365fcf0",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "smoke-expanded-gemma-4-26b-a4b-it",
+      "stage": "smoke",
+      "candidate": "gemma-4-26b-a4b-it",
+      "provider": "gemini",
+      "model": "gemma-4-26b-a4b-it",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "dbd68f0edf08c707aa24966d501973d2ca698372f8ddb9900fc3bb7dd882e749",
+      "summary_path": "runs/real-model-20261003/smoke-expanded-gemma-4-26b-a4b-it/summary.json",
+      "summary_sha256": "2ee7acc0c1e4f4a595e179325ecb1fa2662303f87b55ae6e80e00318340aef1b",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "smoke-expanded-gemma-4-31b-it",
+      "stage": "smoke",
+      "candidate": "gemma-4-31b-it",
+      "provider": "gemini",
+      "model": "gemma-4-31b-it",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "dbd68f0edf08c707aa24966d501973d2ca698372f8ddb9900fc3bb7dd882e749",
+      "summary_path": "runs/real-model-20261003/smoke-expanded-gemma-4-31b-it/summary.json",
+      "summary_sha256": "ef1eb530b38420f521a5fe1e1c9d8c1579e2e7f5644ebb21a26e27e80bfc9c42",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "smoke-gemini-2-5-flash",
+      "stage": "smoke",
+      "candidate": "gemini-2-5-flash",
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "454ae2dfd095a88fbcc8afe970b2a9d6d0497897b64bce2283e7c266d9a3e0c5",
+      "summary_path": "runs/real-model-20261003/smoke-gemini-2-5-flash/summary.json",
+      "summary_sha256": "243b2d4753cff5a78ca1a86556273ca048c8028e72138fb10aa956c10cdeb71c",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "smoke-gemini-2-5-flash-lite",
+      "stage": "smoke",
+      "candidate": "gemini-2-5-flash-lite",
+      "provider": "gemini",
+      "model": "gemini-2.5-flash-lite",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "error",
+      "reason": "provider_failure: not_found",
+      "smoke_passed": false,
+      "decision_steps": 1,
+      "environment_actions": 0,
+      "model_calls": 1,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 1321.7336998786777,
+      "inference_wall_ms": 406.652299920097,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 1,
+        "provider_failure_category": "not_found",
+        "provider_http_status": 404,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": true,
+      "config_sha256": "454ae2dfd095a88fbcc8afe970b2a9d6d0497897b64bce2283e7c266d9a3e0c5",
+      "summary_path": "runs/real-model-20261003/smoke-gemini-2-5-flash-lite/summary.json",
+      "summary_sha256": "454125858daa604c54f7e4b72a13d41097e1fe619a0fa2b58bd2afb7a38fdd01",
+      "trace_path": "runs/real-model-20261003/smoke-gemini-2-5-flash-lite/gemini-2-5-flash-lite/resource-acquisition/42/events.jsonl",
+      "trace_sha256": "74c8844ee6751fb02f4150d7a45f7adcbc9a3410981cf2f7fc98d5054a7e2076",
+      "calls": [
+        {
+          "call_index": 0,
+          "status": "provider_failure",
+          "requested_model": "gemini-2.5-flash-lite",
+          "reported_model": null,
+          "usage": {
+            "input_tokens": null,
+            "output_tokens": null,
+            "reasoning_tokens": null,
+            "cached_input_tokens": null,
+            "provider_total_tokens": null,
+            "provider_request_id": null,
+            "measurement": "unavailable",
+            "measurement_source": null
+          },
+          "rate_limits": null,
+          "latency_ms": 406.652299920097,
+          "http_status": 404,
+          "historical_provider_category": "not_found",
+          "stop_batch": false
+        }
+      ],
+      "trajectory_notes": [
+        "Accepted environment actions: 0.",
+        "Declared task outcome: unknown; termination: provider_failure: not_found."
+      ]
+    },
+    {
+      "batch": "smoke-gemini-2-5-pro",
+      "stage": "smoke",
+      "candidate": "gemini-2-5-pro",
+      "provider": "gemini",
+      "model": "gemini-2.5-pro",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "454ae2dfd095a88fbcc8afe970b2a9d6d0497897b64bce2283e7c266d9a3e0c5",
+      "summary_path": "runs/real-model-20261003/smoke-gemini-2-5-pro/summary.json",
+      "summary_sha256": "47173e7c51dcc1cd1a4a488ca50493916e645434fdbeb3da092b8784a7e6e4a9",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "smoke-gemini-3-1-flash-lite",
+      "stage": "smoke",
+      "candidate": "gemini-3-1-flash-lite",
+      "provider": "gemini",
+      "model": "gemini-3.1-flash-lite",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "454ae2dfd095a88fbcc8afe970b2a9d6d0497897b64bce2283e7c266d9a3e0c5",
+      "summary_path": "runs/real-model-20261003/smoke-gemini-3-1-flash-lite/summary.json",
+      "summary_sha256": "d0841f22b79b138d0f4c190515684fb37127f7251a884a3239247a7101d6ae1c",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "smoke-gemini-3-5-flash",
+      "stage": "smoke",
+      "candidate": "gemini-3-5-flash",
+      "provider": "gemini",
+      "model": "gemini-3.5-flash",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "454ae2dfd095a88fbcc8afe970b2a9d6d0497897b64bce2283e7c266d9a3e0c5",
+      "summary_path": "runs/real-model-20261003/smoke-gemini-3-5-flash/summary.json",
+      "summary_sha256": "a628ca27df5d91df9491b0c3b9b5cab4441153fa59603e3bf42ebee4d819a1d7",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "smoke-gemini-3-5-flash-lite",
+      "stage": "smoke",
+      "candidate": "gemini-3-5-flash-lite",
+      "provider": "gemini",
+      "model": "gemini-3.5-flash-lite",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "454ae2dfd095a88fbcc8afe970b2a9d6d0497897b64bce2283e7c266d9a3e0c5",
+      "summary_path": "runs/real-model-20261003/smoke-gemini-3-5-flash-lite/summary.json",
+      "summary_sha256": "6236e6511faff167bdaa7f1aa10dae63bf38ec66e15d7246367c6026406e35cd",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "smoke-gemini-3-6-flash",
+      "stage": "smoke",
+      "candidate": "gemini-3-6-flash",
+      "provider": "gemini",
+      "model": "gemini-3.6-flash",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "454ae2dfd095a88fbcc8afe970b2a9d6d0497897b64bce2283e7c266d9a3e0c5",
+      "summary_path": "runs/real-model-20261003/smoke-gemini-3-6-flash/summary.json",
+      "summary_sha256": "52e61b579c85f2eacaf327157f72fd79f32eb2598dff9a5582919b3475cf83dd",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "smoke-gemini-3-7-flash",
+      "stage": "smoke",
+      "candidate": "gemini-3-7-flash",
+      "provider": "gemini",
+      "model": "gemini-3.7-flash",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "454ae2dfd095a88fbcc8afe970b2a9d6d0497897b64bce2283e7c266d9a3e0c5",
+      "summary_path": "runs/real-model-20261003/smoke-gemini-3-7-flash/summary.json",
+      "summary_sha256": "5c98eee4be940e3dcb770bfbcf97b3b2a1b46423fce8f099cb6bd8f65290df65",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "smoke-gemini-3-8-flash",
+      "stage": "smoke",
+      "candidate": "gemini-3-8-flash",
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "skipped",
+      "reason": "provider_batch_stopped",
+      "smoke_passed": null,
+      "decision_steps": 0,
+      "environment_actions": 0,
+      "model_calls": 0,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": null
+      },
+      "episode_wall_ms": 0.0,
+      "inference_wall_ms": 0,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": false,
+        "task_outcome": "unknown",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": false,
+      "config_sha256": "454ae2dfd095a88fbcc8afe970b2a9d6d0497897b64bce2283e7c266d9a3e0c5",
+      "summary_path": "runs/real-model-20261003/smoke-gemini-3-8-flash/summary.json",
+      "summary_sha256": "eecc4c2ac1977e4ef78067fd7ab3154aec8e04bdb0c1d0784e7eefd5c4e73853",
+      "trace_path": null,
+      "trace_sha256": null,
+      "calls": [],
+      "trajectory_notes": [
+        "No model trajectory was dispatched."
+      ]
+    },
+    {
+      "batch": "smoke-openai-gpt-oss-120b",
+      "stage": "smoke",
+      "candidate": "openai-gpt-oss-120b",
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "failed",
+      "reason": "environment_truncated",
+      "smoke_passed": true,
+      "decision_steps": 1,
+      "environment_actions": 1,
+      "model_calls": 1,
+      "usage": {
+        "input_tokens": 2027,
+        "output_tokens": 261,
+        "reasoning_tokens": 246,
+        "cached_input_tokens": null,
+        "provider_total_tokens": 2288
+      },
+      "episode_wall_ms": 53889.70450009219,
+      "inference_wall_ms": 1204.3799001257867,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": true,
+        "task_outcome": "failed",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": true,
+      "config_sha256": "454ae2dfd095a88fbcc8afe970b2a9d6d0497897b64bce2283e7c266d9a3e0c5",
+      "summary_path": "runs/real-model-20261003/smoke-openai-gpt-oss-120b/summary.json",
+      "summary_sha256": "8929d4bca0940f886e91a6fb1764a2d175290dac4cbeb9c28e288f663a9e330d",
+      "trace_path": "runs/real-model-20261003/smoke-openai-gpt-oss-120b/openai-gpt-oss-120b/resource-acquisition/42/events.jsonl",
+      "trace_sha256": "42498af7e3771cb1c1a35c18d69c66be3bd64170be3182e6a175f12de94a1e59",
+      "calls": [
+        {
+          "call_index": 0,
+          "status": "response_received",
+          "requested_model": "openai/gpt-oss-120b",
+          "reported_model": "openai/gpt-oss-120b",
+          "usage": {
+            "input_tokens": 2027,
+            "output_tokens": 261,
+            "reasoning_tokens": 246,
+            "cached_input_tokens": null,
+            "provider_total_tokens": 2288,
+            "provider_request_id": "req_01m40hc72geb6vj0k0hvrfekc9",
+            "measurement": "provider",
+            "measurement_source": "groq.chat.completions.usage"
+          },
+          "rate_limits": {
+            "request_limit": 1000,
+            "token_limit": 8000,
+            "remaining_requests": 999,
+            "remaining_tokens": 5748,
+            "request_reset_seconds": 86.4,
+            "token_reset_seconds": 16.889
+          },
+          "latency_ms": 1204.3799001257867,
+          "http_status": null
+        }
+      ],
+      "trajectory_notes": [
+        "Accepted environment actions: 1.",
+        "First accepted action: Move West; last accepted action: Move West.",
+        "Declared task outcome: failed; termination: environment_truncated."
+      ]
+    },
+    {
+      "batch": "smoke-openai-gpt-oss-20b",
+      "stage": "smoke",
+      "candidate": "openai-gpt-oss-20b",
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "failed",
+      "reason": "environment_truncated",
+      "smoke_passed": true,
+      "decision_steps": 1,
+      "environment_actions": 1,
+      "model_calls": 1,
+      "usage": {
+        "input_tokens": 2027,
+        "output_tokens": 86,
+        "reasoning_tokens": 68,
+        "cached_input_tokens": null,
+        "provider_total_tokens": 2113
+      },
+      "episode_wall_ms": 10625.585299916565,
+      "inference_wall_ms": 743.2959000580013,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": true,
+        "task_outcome": "failed",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": true,
+      "config_sha256": "454ae2dfd095a88fbcc8afe970b2a9d6d0497897b64bce2283e7c266d9a3e0c5",
+      "summary_path": "runs/real-model-20261003/smoke-openai-gpt-oss-20b/summary.json",
+      "summary_sha256": "f23450c5ab437e7653715159aa5e509a9ecd2e480fb70324e7cad784b146321f",
+      "trace_path": "runs/real-model-20261003/smoke-openai-gpt-oss-20b/openai-gpt-oss-20b/resource-acquisition/42/events.jsonl",
+      "trace_sha256": "3024fce138da528f95ae8db77208eab442aa96907e91cd8efa50615351cbd45a",
+      "calls": [
+        {
+          "call_index": 0,
+          "status": "response_received",
+          "requested_model": "openai/gpt-oss-20b",
+          "reported_model": "openai/gpt-oss-20b",
+          "usage": {
+            "input_tokens": 2027,
+            "output_tokens": 86,
+            "reasoning_tokens": 68,
+            "cached_input_tokens": null,
+            "provider_total_tokens": 2113,
+            "provider_request_id": "req_01m40habgmerdtnsx8cetaeq2r",
+            "measurement": "provider",
+            "measurement_source": "groq.chat.completions.usage"
+          },
+          "rate_limits": {
+            "request_limit": 1000,
+            "token_limit": 8000,
+            "remaining_requests": 999,
+            "remaining_tokens": 5517,
+            "request_reset_seconds": 86.4,
+            "token_reset_seconds": 18.622
+          },
+          "latency_ms": 743.2959000580013,
+          "http_status": null
+        }
+      ],
+      "trajectory_notes": [
+        "Accepted environment actions: 1.",
+        "First accepted action: Move West; last accepted action: Move West.",
+        "Declared task outcome: failed; termination: environment_truncated."
+      ]
+    },
+    {
+      "batch": "smoke-qwen-qwen3-8-27b",
+      "stage": "smoke",
+      "candidate": "qwen-qwen3-8-27b",
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "declared_role": "candidate",
+      "family": "resource-acquisition",
+      "task": "collect_wood",
+      "seed": 42,
+      "status": "failed",
+      "reason": "environment_truncated",
+      "smoke_passed": true,
+      "decision_steps": 1,
+      "environment_actions": 1,
+      "model_calls": 1,
+      "usage": {
+        "input_tokens": 1984,
+        "output_tokens": 7,
+        "reasoning_tokens": null,
+        "cached_input_tokens": null,
+        "provider_total_tokens": 1991
+      },
+      "episode_wall_ms": 70160.27790005319,
+      "inference_wall_ms": 419.8546998668462,
+      "metrics": {
+        "invalid_json": 0,
+        "invalid_action": 0,
+        "provider_failures": 0,
+        "provider_failure_category": null,
+        "provider_http_status": null,
+        "provider_stop_batch": false,
+        "step_cap": true,
+        "task_outcome": "failed",
+        "batch_stop_reason": null
+      },
+      "initial_hashes": {
+        "snapshot_sha256": "48daae8bfbfa94c2c4f3152aa547153a00da72fc2249e13011af99d0c5f1744b",
+        "advertised_actions_sha256": "eaf0f239b76af9c1a1422c50199e50cae6182cf54953e0d3af1fb5c9c706ab46",
+        "visible_prompt_sha256": "855695dc33f3a5ff1342c4719a976fe7703b4d8d0d3cb871a3a0e5a184196c50"
+      },
+      "initial_trace_matches": true,
+      "config_sha256": "454ae2dfd095a88fbcc8afe970b2a9d6d0497897b64bce2283e7c266d9a3e0c5",
+      "summary_path": "runs/real-model-20261003/smoke-qwen-qwen3-8-27b/summary.json",
+      "summary_sha256": "61a72c7a5b8f6b21329c2184a18d4e6a919ac65e7a3e35eee5dc87466b06e4a1",
+      "trace_path": "runs/real-model-20261003/smoke-qwen-qwen3-8-27b/qwen-qwen3-8-27b/resource-acquisition/42/events.jsonl",
+      "trace_sha256": "a9bd66e941a790c4ecc9284c8be35f5b63261a07d92da5790899c07da1a5e76e",
+      "calls": [
+        {
+          "call_index": 0,
+          "status": "response_received",
+          "requested_model": "qwen/qwen3.8-27b",
+          "reported_model": "qwen/qwen3.8-27b",
+          "usage": {
+            "input_tokens": 1984,
+            "output_tokens": 7,
+            "reasoning_tokens": null,
+            "cached_input_tokens": null,
+            "provider_total_tokens": 1991,
+            "provider_request_id": "req_01m40he2m2ehfs0fe22f9hk6pv",
+            "measurement": "provider",
+            "measurement_source": "groq.chat.completions.usage"
+          },
+          "rate_limits": {
+            "request_limit": 1000,
+            "token_limit": 8000,
+            "remaining_requests": 999,
+            "remaining_tokens": 5885,
+            "request_reset_seconds": 86.4,
+            "token_reset_seconds": 15.862
+          },
+          "latency_ms": 419.8546998668462,
+          "http_status": null
+        }
+      ],
+      "trajectory_notes": [
+        "Accepted environment actions: 1.",
+        "First accepted action: Move West; last accepted action: Move West.",
+        "Declared task outcome: failed; termination: environment_truncated."
+      ]
+    }
+  ]
+}

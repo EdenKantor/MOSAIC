@@ -1,0 +1,53 @@
+{
+  "date_utc": "2026-10-03",
+  "status": "INCOMPLETE_PROVIDER_BLOCKED",
+  "selected_weak": null,
+  "selected_teacher": null,
+  "observed_pair": {
+    "provider": "groq",
+    "models": [
+      "openai/gpt-oss-20b",
+      "openai/gpt-oss-120b"
+    ],
+    "family": "resource-acquisition",
+    "task": "collect_wood",
+    "seed": 42,
+    "successes_per_model": 1,
+    "completed_episodes_per_model": 1,
+    "initial_snapshot_action_prompt_hashes_match": true,
+    "observed_success_gap_percentage_points": 0,
+    "interpretation": "No separation on this single diagnostic seed; population gap unknown."
+  },
+  "families": [
+    {
+      "family": "resource-acquisition",
+      "label": "CEILING",
+      "scope": "single-seed signal only",
+      "reason": "Both completed GPT-OSS candidates succeeded on seed 42; Qwen and Gemini capability incomplete."
+    },
+    {
+      "family": "navigation-and-acquisition",
+      "label": "AMBIGUOUS",
+      "reason": "No complete real-model diagnostic episode."
+    },
+    {
+      "family": "simple-crafting",
+      "label": "AMBIGUOUS",
+      "reason": "No complete real-model diagnostic episode."
+    },
+    {
+      "family": "multi-step-crafting",
+      "label": "AMBIGUOUS",
+      "reason": "No complete real-model diagnostic episode."
+    }
+  ],
+  "five_seed_pilot": "NOT_RUN",
+  "milestone_1_75": "NOT_FROZEN",
+  "milestone_2_R": "NOT_IMPLEMENTED",
+  "milestone_3": "STOPPED",
+  "paid_access": "NONE",
+  "billing_changes": 0,
+  "rejected_as_empirical_pair": [],
+  "selection_rationale": "Insufficient completed families/seeds and no demonstrated useful capability gap. Infrastructure failures are not evidence of model incapability.",
+  "next_step": "Resume real-model calibration when verified free quota and provider availability permit."
+}

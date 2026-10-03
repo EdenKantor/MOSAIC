@@ -1,0 +1,215 @@
+{
+  "selection_id": "alem-free-models-20261003",
+  "stage": "selection",
+  "environment": {
+    "name": "alem",
+    "revision": "14d412e5ee961f9c43d6ce92ee05fee9cd1efc5e"
+  },
+  "agent": {
+    "agent_id": "agent_0"
+  },
+  "prompt_protocol": "alem_official_v1",
+  "history_limit": 8,
+  "seed": 42,
+  "free_only": true,
+  "candidates": [
+    {
+      "name": "gemini-2-5-flash-lite",
+      "model": {
+        "provider": "gemini",
+        "model": "gemini-2.5-flash-lite",
+        "temperature": 0,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 120
+      },
+      "role": "candidate",
+      "available": true
+    },
+    {
+      "name": "gemini-3-5-flash-lite",
+      "model": {
+        "provider": "gemini",
+        "model": "gemini-3.5-flash-lite",
+        "temperature": 0,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 120
+      },
+      "role": "candidate",
+      "available": true
+    },
+    {
+      "name": "gemini-3-1-flash-lite",
+      "model": {
+        "provider": "gemini",
+        "model": "gemini-3.1-flash-lite",
+        "temperature": 0,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 120
+      },
+      "role": "candidate",
+      "available": true
+    },
+    {
+      "name": "gemini-2-5-flash",
+      "model": {
+        "provider": "gemini",
+        "model": "gemini-2.5-flash",
+        "temperature": 0,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 120
+      },
+      "role": "candidate",
+      "available": true
+    },
+    {
+      "name": "gemini-2-5-pro",
+      "model": {
+        "provider": "gemini",
+        "model": "gemini-2.5-pro",
+        "temperature": 0,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 120
+      },
+      "role": "candidate",
+      "available": true
+    },
+    {
+      "name": "gemini-3-5-flash",
+      "model": {
+        "provider": "gemini",
+        "model": "gemini-3.5-flash",
+        "temperature": 0,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 120
+      },
+      "role": "candidate",
+      "available": true
+    },
+    {
+      "name": "gemini-3-6-flash",
+      "model": {
+        "provider": "gemini",
+        "model": "gemini-3.6-flash",
+        "temperature": 0,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 120
+      },
+      "role": "candidate",
+      "available": true
+    },
+    {
+      "name": "gemini-3-7-flash",
+      "model": {
+        "provider": "gemini",
+        "model": "gemini-3.7-flash",
+        "temperature": 0,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 120
+      },
+      "role": "candidate",
+      "available": true
+    },
+    {
+      "name": "gemini-3-8-flash",
+      "model": {
+        "provider": "gemini",
+        "model": "gemini-3.8-flash",
+        "temperature": 0,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 120
+      },
+      "role": "candidate",
+      "available": true
+    },
+    {
+      "name": "openai-gpt-oss-20b",
+      "model": {
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "temperature": 0,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 120,
+        "reasoning_effort": "medium"
+      },
+      "role": "candidate",
+      "available": true
+    },
+    {
+      "name": "openai-gpt-oss-120b",
+      "model": {
+        "provider": "groq",
+        "model": "openai/gpt-oss-120b",
+        "temperature": 0,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 120,
+        "reasoning_effort": "medium"
+      },
+      "role": "candidate",
+      "available": true
+    },
+    {
+      "name": "qwen-qwen3-8-27b",
+      "model": {
+        "provider": "groq",
+        "model": "qwen/qwen3.8-27b",
+        "temperature": 0,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 120
+      },
+      "role": "candidate",
+      "available": true
+    },
+    {
+      "name": "allam-2-7b",
+      "model": {
+        "provider": "groq",
+        "model": "allam-2-7b",
+        "temperature": 0,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 120
+      },
+      "available": false,
+      "access_reason": "access_unverified"
+    }
+  ],
+  "families": [
+    {
+      "name": "resource-acquisition",
+      "task": "collect_wood",
+      "max_steps": 200
+    },
+    {
+      "name": "navigation-and-acquisition",
+      "task": "collect_stone",
+      "max_steps": 200
+    },
+    {
+      "name": "simple-crafting",
+      "task": "make_wood_pickaxe",
+      "max_steps": 200
+    },
+    {
+      "name": "multi-step-crafting",
+      "task": "make_stone_pickaxe",
+      "max_steps": 200
+    }
+  ],
+  "request_limits": [
+    {
+      "provider": "gemini",
+      "max_requests": 25,
+      "quota_known": false,
+      "max_episodes": 1,
+      "min_interval_seconds": 61
+    },
+    {
+      "provider": "groq",
+      "max_requests": 25,
+      "quota_known": false,
+      "max_episodes": 1,
+      "min_interval_seconds": 61,
+      "request_token_ceiling": 8000,
+      "max_total_tokens": 200000
+    }
+  ]
+}
